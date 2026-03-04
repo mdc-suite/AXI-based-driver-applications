@@ -22,5 +22,16 @@ BBLAYERS ?= " \
   ${TOPDIR}/../sources/meta-axi-dma \
 "
 ```
+### 3. Build the system
+To build the full Linux image including all AXI DMA components, run:
+```bash
+bitbake axi-dma-image
+```
 
 
+## On-Target usage:
+Once the image is running on your target hardware, a helper script is provided to manage the FPGA state:
+```bash
+sudo fpga-select
+```
+This script allows you to choose between the AES accelerator or the VPA accelerator, automatically handling fpgautil commands to load the bitstream and apply the correct device tree overlay.
