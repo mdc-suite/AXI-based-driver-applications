@@ -1,6 +1,5 @@
 # meta-axi-dma: Yocto Layer for AXI DMA
 This Yocto layer, **`meta-axi-dma`**, provides the necessary recipes to integrate the AXI DMA kernel driver, userspace test applications, and FPGA initialization scripts into a custom Linux distribution.
----
 
 ## How to Import the Layer
 To include this layer in your Yocto Project build environment, follow these steps:
@@ -27,7 +26,6 @@ To build the full Linux image including all AXI DMA components, run:
 ```bash
 bitbake axi-dma-image
 ```
-
 
 ## On-Target usage:
 Once the image is running on your target hardware, a helper script is provided to manage the FPGA state:
