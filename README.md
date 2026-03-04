@@ -10,4 +10,4 @@ Consequently, to use this driver, a custom IP must have at least:
 ## Repository Structure
 This repository is organized as follows:
 * **`ubuntu-driver/`** and **`yocto-driver/`**: Contain the specific instructions and source code to compile and install the driver on the respective operating systems.
-* **`aes/`** and **`vpa/`**: Contain examples of hardware accelerators that implement the AXI4-Stream interface described above, including their test applications to verify correct operation.
+* **`applications`**: Contain examples of hardware accelerators that implement the AXI4-Stream interface described above, including their test applications to verify correct operation.
