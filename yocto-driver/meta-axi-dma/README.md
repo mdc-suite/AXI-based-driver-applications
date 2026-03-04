@@ -12,8 +12,8 @@ Contains the AXI DMA driver.
 
 ### recipes-apps/
 Contains userspace applications to test the hardware.
-* **dmatest/**: BitBake recipes for `dma-test-aes`. This compile the C source files and install the binaries into `/usr/bin/` (using `${bindir}`) on the target image.
-* * **vpatest/**: BitBake recipes for `dma-test-vpa`. This compile the C source files and install the binaries into `/usr/bin/` (using `${bindir}`) on the target image.
+* **dma-test-aes/**: BitBake recipes for `dma-test-aes`. This compile the C source files and install the binaries into `/usr/bin/` (using `${bindir}`) on the target image.
+* **dma-test-vpa/**: BitBake recipes for `dma-test-vpa`. This compile the C source files and install the binaries into `/usr/bin/` (using `${bindir}`) on the target image.
 
 ### recipes-core/
 Contains the core system logic and the custom image definition.
