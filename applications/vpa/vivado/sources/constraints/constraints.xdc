@@ -1,0 +1,1 @@
+create_clock -name clk_pl_0 -period 5 -waveform {0.000 2.500} [get_pins line_detector_bd_i/zynq_ultra_ps_e_0/U0/PS8_i/PLCLK[0]]
