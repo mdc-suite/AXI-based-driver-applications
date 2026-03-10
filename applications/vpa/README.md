@@ -28,8 +28,10 @@ current_pos.write(outw);
 In the reference Vivado Block Design:
 - `im_axis_in` is connected to the **MM2S** channel of an AXI DMA.
 - `current_pos` is connected to the **S2MM** channel of an AXI DMA.
+
 On the software side, the custom driver exposes these as numbered channels.  
 In the current setup:
+
 - **Channel 0** → MM2S (image input → `im_axis_in`)
 - **Channel 1** → S2MM (IP output ← `current_pos`)
 
