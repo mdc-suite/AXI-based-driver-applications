@@ -82,23 +82,23 @@ sudo ./test
 ```
 Example console output (clean/reset IP):
 ```text
-DMA device aperto: /dev/uniss_dma
-Caricamento input32.txt...
-Caricati 12496 bytes (3124 words) dall'immagine
-Input immagine (primi 64 bytes):
+DMA device opened: /dev/uniss_dma
+Loading input32.txt...
+Loaded 12496 bytes (3124 words) from the image
+Input image (first 64 bytes):
 ...
 
-DMA resettato
+DMA reset done
 
 === MM2S im_axis_in (Channel 0) ===
-MM2S immagine avviato (12496 bytes)
-✓ MM2S COMPLETATO
+MM2S image transfer started (12496 bytes)
+MM2S transfer completed
 
 === S2MM output (Channel 1, 4 bytes) ===
-S2MM output avviato (4 bytes)
-✓ S2MM COMPLETATO
+S2MM output transfer started (4 bytes)
+S2MM transfer completed
 
-Output IP (primi 16 bytes):
+IP output (first 16 bytes):
 28 00 00 00 00 00 00 00 ...
 Output (int32): 40
 ```
