@@ -1,4 +1,4 @@
-Run the HLS-based Platform Generation Flow with the following steps (Vivado ML v2023.1 is assumed to be installed):
+Run the HLS-based Platform Generation Flow with the following steps (Vivado ML v2021.2 is assumed to be installed):
 
 1. 	Open a terminal from this folder.
 
