@@ -21,3 +21,5 @@ Run the HLS-based platform generation flow with the following steps (Vivado ML v
    ```bash
    vivado ./line_detector/line_detector.xpr
    ```
+
+5. Check the project in Vivado and generate the bitstream.
