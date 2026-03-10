@@ -77,12 +77,12 @@ vpa/
 ```
 
 ## Run example
-From the `vpa` folder (or wherever `test.c` lives):
+From the `vpa` folder (or wherever `vpa_test.c` lives):
 ```bash
-gcc test.c -o test
-sudo ./test
+gcc vpa_test.c -o vpa_test
+sudo ./vpa_test
 ```
-Example console output (clean/reset IP):
+Example console output:
 ```text
 DMA device opened: /dev/uniss_dma
 Loading input32.txt...
