@@ -120,4 +120,4 @@ DMA transfer started.
 DMA transfer started.
 
 Encrypted output:
-...
+```
