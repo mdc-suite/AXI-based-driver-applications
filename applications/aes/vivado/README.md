@@ -1,10 +1,11 @@
-I progetti sono tutti creati con Vivado 2021.
+## Notes
 
-Vivado supporta progetti di versioni precedenti, bisogna fare "save as" e ricreare il nuovo progetto per la tua versione. 
+All projects were created with **Vivado 2021**.
 
-Contenuto della cartella:
-	- aes256_copr: progetto Vivado da cui è stato derivato l'IP per AES256
-	- aes256_ip: IP importabile su Vivado
-	- aes256_prj: progetto Vivado con sistema completo 
-	- src_hdl: sorgenti Verilog per IP aes
-	- design_1.tcl: script per ricreare il progetto (backup se ci sono problemi di versioni con il progetto Vivado).
+Vivado can usually open projects created with earlier versions. If version compatibility issues occur, open the project in your installed Vivado version, use **Save As**, and recreate the project files for your current toolchain.
+
+## Folder Contents
+
+- `aes256_ip` — Importable AES256 IP for Vivado
+- `src_hdl` — Verilog source files for the AES IP
+- `design_1.tcl` — Tcl script used to recreate the project
