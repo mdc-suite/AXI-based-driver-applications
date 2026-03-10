@@ -33,10 +33,10 @@ int main() {
         perror("Failed to open /dev/uniss_dma");
         return 1;
     }
-    printf("DMA device aperto: %s\n", DEVICE_FILE);
+    printf("DMA device opened: %s\n", DEVICE_FILE);
 
-    // 1) Leggi input immagine da file
-    printf("Caricamento %s...\n", INPUT_FILE);
+    // 1) Read input image from file
+    printf("Loading %s...\n", INPUT_FILE);
     FILE *f = fopen(INPUT_FILE, "r");
     if (!f) {
         perror("fopen input32.txt");
@@ -63,9 +63,9 @@ int main() {
     }
     fclose(f);
 
-    printf("Caricati %d bytes (%d words) dall'immagine\n", img_bytes, img_bytes / 4);
+    printf("Loaded %d bytes (%d words) from the image\n", img_bytes, img_bytes / 4);
 
-    printf("Input immagine (primi 64 bytes):\n");
+    printf("Input image (first 64 bytes):\n");
     print_mem(img_buf, 64);
 
     // 2) Reset DMA
@@ -73,9 +73,9 @@ int main() {
         perror("DMA reset failed");
         goto cleanup;
     }
-    printf("DMA resettato\n");
+    printf("DMA reset done\n");
 
-    // 3) MM2S Channel 0: invia immagine all'IP (im_axis_in)
+    // 3) MM2S Channel 0: send image to the IP (im_axis_in)
     printf("\n=== MM2S im_axis_in (Channel 0) ===\n");
     if (ioctl(fd, IOCTL_SELECT_CHANNEL, 0) < 0) {
         perror("Select channel 0 failed");
@@ -89,7 +89,7 @@ int main() {
         perror("Start MM2S img failed");
         goto cleanup;
     }
-    printf("MM2S immagine avviato (%d bytes)\n", img_bytes);
+    printf("MM2S image transfer started (%d bytes)\n", img_bytes);
 
     do {
         if (ioctl(fd, IOCTL_READ_STATUS_REGISTER, status) < 0) {
@@ -97,9 +97,9 @@ int main() {
             goto cleanup;
         }
     } while (!(*status & 0x2));
-    printf("✓ MM2S COMPLETATO\n");
+    printf("MM2S transfer completed\n");
 
-    // 4) S2MM Channel 1: ricevi SOLO 4 bytes (1 word) dall'output IP (current_pos)
+    // 4) S2MM Channel 1: receive only 4 bytes (1 word) from the IP output (current_pos)
     printf("\n=== S2MM output (Channel 1, 4 bytes) ===\n");
     if (ioctl(fd, IOCTL_SELECT_CHANNEL, 1) < 0) {
         perror("Select channel 1 failed");
@@ -112,7 +112,7 @@ int main() {
         perror("Start S2MM failed");
         goto cleanup;
     }
-    printf("S2MM output avviato (4 bytes)\n");
+    printf("S2MM output transfer started (4 bytes)\n");
 
     do {
         if (ioctl(fd, IOCTL_READ_STATUS_REGISTER, status) < 0) {
@@ -125,10 +125,10 @@ int main() {
         perror("Read output buffer failed");
         goto cleanup;
     }
-    printf("✓ S2MM COMPLETATO\n");
+    printf("S2MM transfer completed\n");
 
-    // 5) Stampa output
-    printf("\nOutput IP (primi 16 bytes):\n");
+    // 5) Print output
+    printf("\nIP output (first 16 bytes):\n");
     print_mem(out_buf, 16);
     printf("Output (int32): %d\n", *(int32_t*)out_buf);
 
@@ -137,6 +137,6 @@ cleanup:
     free(out_buf);
     free(status);
     close(fd);
-    printf("Test terminato.\n");
+    printf("Test finished.\n");
     return 0;
 }
