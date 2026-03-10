@@ -69,7 +69,7 @@ Suggested Directory Layout
 ```text
 vpa/
   ├── hls/            # HLS sources (top_module, lineDet.cpp, etc.)
-  ├── vivado/             # Bitstream, XSA, device-tree overlay for VPA_IP + DMA
+  ├── vivado/         # Bitstream, XSA, device-tree overlay for VPA_IP + DMA
   ├── sw/
   │   ├── test.c      # Userspace AXI DMA test application for VPA_IP
   │   └── input32.txt # Example image input in hex format
