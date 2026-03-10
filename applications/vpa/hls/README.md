@@ -1,11 +1,19 @@
-Run the HLS-based IP Generation Flow with the following steps (Vitis HLS v2021.2 is assumed to be installed):
+## IP Generation Flow
 
-1. 	Open a terminal from this folder.
+Run the HLS-based IP generation flow with the following steps (Vitis HLS v2021.2 is assumed to be installed):
 
-2. 	Run the Tcl script by the following command:
-	vitis_hls -f run_hls.tcl
+1. Open a terminal in this folder.
 
-3. 	Open the generated IP project by the following command:
-	vitis_hls -p prj_VPA_IP
-	
-4. 	Check the project in Vitis HLS.
+2. Run the Tcl script:
+
+   ```bash
+   vitis_hls -f run_hls.tcl
+   ```
+
+3. Open the generated IP project:
+
+   ```bash
+   vitis_hls -p prj_VPA_IP
+   ```
+
+4. Check the project in Vitis HLS.
