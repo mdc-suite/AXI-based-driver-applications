@@ -89,7 +89,7 @@ aes/
   │   ├── dma_test_aes.c  # Userspace AXI DMA AES test application
   │   ├── pl_aes.dtbo     # Device tree overlay for AES
   │   └── pl_aes.dtsi     # Device tree source include file for AES
-  └── README.md       # This file
+  └── README.md           # This file
 ```
 
 ## Run example
