@@ -82,7 +82,6 @@ The userspace C test application performs the following steps:
 Suggested Directory Layout
 ```text
 aes/
-  ├── hls/                # HLS sources for the AES accelerator
   ├── vivado/             # Vivado project generation files
   ├── sw/
   │   ├── aes256_dma.bit  # Bitstream generated from the Vivado Project
