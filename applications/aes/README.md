@@ -82,11 +82,13 @@ The userspace C test application performs the following steps:
 Suggested Directory Layout
 ```text
 aes/
-  ├── hls/            # HLS sources for the AES accelerator
-  ├── vivado/         # Bitstream, XSA, DT overlay, block design exports
+  ├── hls/                # HLS sources for the AES accelerator
+  ├── vivado/             # Vivado project generation files
   ├── sw/
-  │   ├── aes_test.c  # Userspace AXI DMA AES test application
-  │   └── README.md   # Optional software-specific notes
+  │   ├── aes256_dma.bit  # Bitstream generated from the Vivado Project
+  │   ├── dma_test_aes.c  # Userspace AXI DMA AES test application
+  │   ├── pl_aes.dtbo     # Device tree overlay for AES
+  │   └── pl_aes.dtsi     # Device tree source include file for AES
   └── README.md       # This file
 ```
 
