@@ -93,10 +93,10 @@ aes/
 ```
 
 ## Run example
-From the `aes` folder (or wherever `aes_test.c` lives):
+From the `aes` folder (or wherever `dma_test_aes.c` lives):
 ```bash
-gcc aes_test.c -o aes_test
-sudo ./aes_test
+gcc dma_test_aes.c -o dma_test_aes
+sudo ./dma_test_aes
 ```
 Example console output:
 ```text
