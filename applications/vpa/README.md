@@ -69,13 +69,13 @@ Suggested Directory Layout
 ```text
 vpa/
   ├── hls/                    # HLS sources for the VPA accelerator
-  ├── vivado/                 # Vivado project generation files
   ├── sw/
   │   ├── dma_test_vpa.c      # Userspace AXI DMA VPA test application
   │   ├── input32.txt         # Example image input in hex format
   │   ├── pl_vpa.dtbo         # Device tree overlay for VPA
   │   ├── pl_vpa.dtsi         # Userspace AXI DMA test application for VPA
   │   └── vpa_dma.bit         # Device tree source include file for VPA
+  ├── vivado/                 # Vivado project generation files
   └── README.md               # This file
 ```
 
