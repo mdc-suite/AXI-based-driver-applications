@@ -68,19 +68,22 @@ The userspace C test application performs the following steps:
 Suggested Directory Layout
 ```text
 vpa/
-  ├── hls/            # HLS sources (top_module, lineDet.cpp, etc.)
-  ├── vivado/         # Bitstream, XSA, device-tree overlay for VPA_IP + DMA
+  ├── hls/                    # HLS sources for the VPA accelerator
+  ├── vivado/                 # Vivado project generation files
   ├── sw/
-  │   ├── test.c      # Userspace AXI DMA test application for VPA_IP
-  │   └── input32.txt # Example image input in hex format
-  └── README.md       # This file
+  │   ├── dma_test_vpa.c      # Userspace AXI DMA VPA test application
+  │   ├── input32.txt         # Example image input in hex format
+  │   ├── pl_vpa.dtbo         # Device tree overlay for VPA
+  │   ├── pl_vpa.dtsi         # Userspace AXI DMA test application for VPA
+  │   └── vpa_dma.bit         # Device tree source include file for VPA
+  └── README.md               # This file
 ```
 
 ## Run example
-From the `vpa` folder (or wherever `vpa_test.c` lives):
+From the `vpa` folder (or wherever `dma_test_vpa.c` lives):
 ```bash
-gcc vpa_test.c -o vpa_test
-sudo ./vpa_test
+gcc dma_test_vpa.c -o dma_test_vpa
+sudo ./dma_test_vpa
 ```
 Example console output:
 ```text
