@@ -1,6 +1,6 @@
 ## Platform Generation Flow
-
-Run the HLS-based platform generation flow with the following steps (Vivado ML v2021.2 is assumed to be installed):
+All projects were created with Vivado 2021 and for the KV260.
+Run the HLS-based platform generation flow with the following steps:
 
 1. Open a terminal in this folder.
 
