@@ -1,6 +1,6 @@
 ## Notes
 
-All projects were created with **Vivado 2021**.
+All projects were created with **Vivado 2021** and for the **KV260**.
 
 Vivado can usually open projects created with earlier versions. If version compatibility issues occur, open the project in your installed Vivado version, use **Save As**, and recreate the project files for your current toolchain.
 
