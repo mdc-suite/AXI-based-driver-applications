@@ -75,7 +75,7 @@ The `set_env.sh` script automates the entire process of compiling and installing
 6.  **Loading and Verification**: Immediately loads the driver into the kernel using `modprobe` and displays the status via `lsmod` to confirm a successful installation.
 ---
 
-## Usage
+## Script Usage
 To set up your environment, run the following commands in your terminal:
 ```bash
 # Make the script executable
