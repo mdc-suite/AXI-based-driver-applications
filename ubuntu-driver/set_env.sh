@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-git clone https://github.com/GiuseppeSatta/AXI-based-drivers.git
 cd AXI-based-drivers
 
 sudo bash install_libs.sh
