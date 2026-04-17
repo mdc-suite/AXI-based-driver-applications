@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-cd AXI-based-drivers
-
 sudo bash install_libs.sh
 
 cd axidma-driver
