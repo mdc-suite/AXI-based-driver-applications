@@ -1,6 +1,6 @@
 # AES — AXI4-Stream Hardware Accelerator
 
-`AES` is a Vivado HLS–based hardware accelerator designed to be driven by the custom **`/dev/uniss_dma`** AXI DMA driver. It receives plaintext and key data over **AXI4-Stream** input channels and produces the encrypted output on a separate **AXI4-Stream** output channel.
+`AES` is a Vivado HLS–based hardware accelerator proposed in the research article [A multithread AES accelerator for Cyber-Physical Systems](https://dl.acm.org/doi/10.1145/3587135.3592819) and designed to be driven by the custom **`/dev/uniss_dma`** AXI DMA driver. It receives plaintext and key data over **AXI4-Stream** input channels and produces the encrypted output on a separate **AXI4-Stream** output channel.
 
 ## Features
 
