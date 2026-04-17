@@ -1,5 +1,5 @@
 # VPA — AXI4‑Stream Hardware Accelerator
-`VPA` is a Vivado HLS–based hardware accelerator designed to be driven by the custom **`/dev/uniss_dma`** AXI DMA driver.  It receives an input image over **AXI4‑Stream** and produces a 32‑bit result (`current_pos`) on a separate AXI4‑Stream output.
+`VPA` is a Vivado HLS–based hardware accelerator proposed in the research article [Integrating FPGA-Based Acceleration in Industrial Motion Control System](https://ieeexplore.ieee.org/document/11006509) and designed to be driven by the custom **`/dev/uniss_dma`** AXI DMA driver.  It receives an input image over **AXI4‑Stream** and produces a 32‑bit result (`current_pos`) on a separate AXI4‑Stream output.
 
 ## Features
 - AXI4‑Stream **image input** (`im_axis_in`)
