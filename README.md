@@ -1,5 +1,5 @@
 # AXI-based driver - Test applications
-The driver contained in this repository is taken from this [link](https://github.com/GiuseppeSatta/AXI-based-drivers), from which specific test applications have been implemented to verify its functionality.
+The driver is available into the folder **`ubuntu-driver/`**, and test-specific applications have been implemented to verify its functionality.
 
 ## Requirements for Custom IP
 The `/dev/uniss_dma` driver controls an AXI DMA and only supports transfers on AXI4‑Stream interfaces. It uses the MM2S channel of the DMA to send data and the S2MM channel to receive data.
