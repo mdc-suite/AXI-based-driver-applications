@@ -1,0 +1,82 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+    fragment@0 {
+        /* Puntiamo al bus AXI corretto rilevato sul tuo sistema */
+        target-path = "/amba_pl";
+        __overlay__ {
+            #address-cells = <1>;
+            #size-cells = <1>;
+            /* Fondamentale per mappare i registri fisici all'interno del bus AXI */
+            ranges;
+
+            // CONFIGURAZIONE DMA 0 (MM2S)
+            axi_dma_0: dma@a0000000 {
+                compatible = "xlnx,axi-dma";
+                status = "okay";
+                reg = <0xa0000000 0x10000>;
+                #address-cells = <1>;
+                #size-cells = <1>;
+                mm2s-channels = <1>;
+                s2mm-channels = <0>;
+
+                dma_channel_a0000000: dma-channel@0 {
+                    compatible = "xlnx,axi-dma-mm2s-channel";
+                    reg = <0x0>;
+                    xlnx,datawidth = <32>;
+                    xlnx,device-id = <0>;
+                    dma-channels = <1>;
+                    mm2s = <1>;
+                };
+            };
+
+            // CONFIGURAZIONE DMA 1 (MM2S)
+            axi_dma_1: dma@a0100000 {
+                compatible = "xlnx,axi-dma";
+                status = "okay";
+                reg = <0xa0100000 0x10000>;
+                #address-cells = <1>;
+                #size-cells = <1>;
+                mm2s-channels = <1>;
+                s2mm-channels = <0>;
+
+                dma_channel_a0100000: dma-channel@0 {
+                    compatible = "xlnx,axi-dma-mm2s-channel";
+                    reg = <0x0>;
+                    xlnx,datawidth = <32>;
+                    xlnx,device-id = <0>;
+                    dma-channels = <1>;
+                    mm2s = <1>;
+                };
+            };
+
+            // CONFIGURAZIONE DMA 2 (S2MM)
+            axi_dma_2: dma@a0300000 {
+                compatible = "xlnx,axi-dma";
+                status = "okay";
+                reg = <0xa0300000 0x10000>;
+                #address-cells = <1>;
+                #size-cells = <1>;
+                mm2s-channels = <0>;
+                s2mm-channels = <1>;
+
+                dma_channel_a0300030: dma-channel@1 {
+                    compatible = "xlnx,axi-dma-s2mm-channel";
+                    reg = <0x1>;
+                    xlnx,datawidth = <32>;
+                    xlnx,device-id = <0>;
+                    dma-channels = <1>;
+                    mm2s = <0>;
+                };
+            };
+
+            // DRIVER AGGREGATORE CUSTOM (uniss,dmas)
+            dmas {
+                compatible = "uniss,dmas";
+                status = "okay";
+                dev-handles = <&axi_dma_0 &axi_dma_1 &axi_dma_2>;
+            };
+        };
+    };
+};

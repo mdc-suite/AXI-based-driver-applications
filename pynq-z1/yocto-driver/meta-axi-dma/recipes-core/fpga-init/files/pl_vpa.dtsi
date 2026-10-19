@@ -1,0 +1,45 @@
+/dts-v1/;
+/plugin/;
+
+/ {
+   fragment@0 {
+        target-path = "/";
+        __overlay__ {
+            axi_dma_0: axi_dma_0@a0000000 {
+                compatible = "xlnx,axi-dma";
+                status = "okay";
+                reg = <0x0 0xa0000000 0x0 0x10000>;
+                mm2s-channels = <0x1>;
+                s2mm-channels = <0x0>;
+                dma_channel_a0000000: dma-channel@a0000000 {
+                    compatible = "xlnx,axi-dma-mm2s-channel";
+                    xlnx,datawidth = <0x20>;
+                    xlnx,device-id = <0x0>;
+                    dma-channels = <0x1>;
+                    mm2s = <0x1>;
+                };
+            };
+
+            axi_dma_1: axi_dma_1@a0010000 {
+                compatible = "xlnx,axi-dma";
+                status = "okay";
+                reg = <0x0 0xa0010000 0x0 0x10000>;
+                mm2s-channels = <0x0>;
+                s2mm-channels = <0x1>;
+                dma_channel_a0010030: dma-channel@a0010030 {
+                    compatible = "xlnx,axi-dma-s2mm-channel";
+                    xlnx,datawidth = <0x20>;
+                    xlnx,device-id = <0x1>;
+                    dma-channels = <0x1>;
+                    mm2s = <0x0>;
+                };
+            };
+
+            dmas {
+                compatible = "uniss,dmas";
+                status = "okay";
+                dev-handles = <&axi_dma_0 &axi_dma_1>;
+            };
+        };
+    };
+};
