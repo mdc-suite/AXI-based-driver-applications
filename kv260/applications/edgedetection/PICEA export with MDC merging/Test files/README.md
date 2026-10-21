@@ -1,13 +1,13 @@
-## Notes
+# Test Files
 
-The Vivado flow targets **Vivado 2024.2** and the **Kria KV260**, using FPGA part **`xck26-sfvc784-2LV-c`**.
+This folder contains the Kria KV260 bitstream and test data for the Roberts–Sobel accelerator generated through **PICEA export with MDC merging**.
 
-When using another Vivado version, check the availability of the required board definitions and IP versions. Regenerate the project using the supplied Tcl scripts and resolve any compatibility issues before generating the bitstream.
+| File | Description |
+| --- | --- |
+| `design_1_wrapper.bit` | FPGA bitstream. |
+| `in0_file.mem` | Input image tokens for `in0`. |
+| `in1_file.mem` | Image-size parameter for `in1`. |
+| `out0_Roberts_file.mem` | Roberts reference output for `out0`. |
+| `out0_Sobel_file.mem` | Sobel reference output for `out0`. |
 
-## Folder Contents
-
-- `accelerator.json` — Generated accelerator description accompanying the hardware build.
-- `s_accelerator` — Verilog source files for the AES IP
-- `scripts` — Tcl scripts used to recreate the project
-
-The supplied bitstream is located at `../Test files/design_1_wrapper.bit`. Deployment and functional testing are described in the example's main README and the documentation under `../linux/`.
+Use the exact mode names **`Robrts`** and **`Sobel`**. See the [main README](../README.md) for deployment and testing commands.
