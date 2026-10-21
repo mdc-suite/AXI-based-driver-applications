@@ -890,8 +890,8 @@ after replacing both paths:
 
     cd ..
     sudo fpgautil -R
-    sudo fpgautil -b design\_1\_wrapper.bit
-    sudo fpgautil -o /linux/device-tree/pl\_mdc.dtbo
+    sudo fpgautil -b design_1_wrapper.bit
+    sudo fpgautil -o linux/device-tree/pl_mdc.dtbo
 
 The binary bitstream and overlay must describe the same hardware system.
 The overlay must also be compatible with the base device tree of the
@@ -908,7 +908,8 @@ error.
 
 Insert the module built for this accelerator:
 
-    sudo insmod driver/mdc_dma.ko
+
+    sudo insmod linux/driver/mdc_dma.ko
 
 After successful device binding, verify that the accelerator device is
 available (Figure [24](#fig:device){reference-type="ref"
