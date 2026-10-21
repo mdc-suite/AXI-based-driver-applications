@@ -1,0 +1,24 @@
+/dts-v1/;
+/plugin/;
+/* Hardware must be loaded separately before this overlay binds.
+ * KV260 root address/size cells are both 2. No dma-coherent assertion.
+ * This single driver owns all listed register windows.
+ */
+/ {
+  fragment@0 {
+    target-path = "/";
+    __overlay__ {
+      #address-cells = <2>;
+      #size-cells = <2>;
+      mdc_accel: mdc-accelerator@a0010000 {
+        compatible = "mdc,kv260-stream-v1";
+        status = "okay";
+        reg = <0 0xa0010000 0 0x10000>,
+              <0 0xa0000000 0 0x10000>,
+              <0 0xa0100000 0 0x10000>,
+              <0 0xa0300000 0 0x10000>;
+        reg-names = "control", "dma0", "dma1", "dma2";
+      };
+    };
+  };
+};
