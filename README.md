@@ -28,8 +28,6 @@ Inside each board's directory (`kv260/` and `zedboard/`), the content is structu
 
 ## Recent Updates
 
-## Recent Updates
-
 - Extended the Kria KV260 Roberts–Sobel edge-detection example to demonstrate three design flows:
   1. **MDC-only:** CAPH-derived networks and actor HDL, with network merging in MDC.
   2. **PICEA export with MDC merging:** MLIR-to-XDF/CAL export through PICEA, followed by merging in MDC.
