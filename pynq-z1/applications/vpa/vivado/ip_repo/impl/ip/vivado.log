@@ -1,0 +1,57 @@
+#-----------------------------------------------------------
+# Vivado v2024.2 (64-bit)
+# SW Build 5239630 on Fri Nov 08 22:34:34 MST 2024
+# IP Build 5239520 on Sun Nov 10 16:12:51 MST 2024
+# SharedData Build 5239561 on Fri Nov 08 14:39:27 MST 2024
+# Start of session at: Mon Oct 19 13:27:03 2026
+# Process ID         : 105047
+# Current directory  : /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip
+# Command line       : vivado -notrace -mode batch -source run_ippack.tcl
+# Log file           : /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/vivado.log
+# Journal file       : /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/vivado.jou
+# Running On         : marco-Z13
+# Platform           : Ubuntu
+# Operating System   : Ubuntu 22.04.5 LTS
+# Processor Detail   : 11th Gen Intel(R) Core(TM) i7-11700 @ 2.50GHz
+# CPU Frequency      : 2500.000 MHz
+# CPU Physical cores : 8
+# CPU Logical cores  : 16
+# Host memory        : 16565 MB
+# Swap memory        : 8589 MB
+# Total Virtual      : 25155 MB
+# Available Virtual  : 15735 MB
+#-----------------------------------------------------------
+source run_ippack.tcl -notrace
+INFO: calling package_hls_ip ip_types=vitis sysgen json_file=/home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/solution1_data.json outdir=/home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip srcdir=/home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1 sort_interfaces_ports=false
+INFO: Copied 1 ipmisc file(s) to /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/misc
+INFO: Copied 92 verilog file(s) to /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/hdl/verilog
+INFO: Copied 72 vhdl file(s) to /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/hdl/vhdl
+Generating 2 subcores in /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/hdl/ip.tmp:
+impl/misc/top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip.tcl
+impl/misc/top_module_sitodp_32s_64_7_no_dsp_1_ip.tcl
+INFO: Using COE_DIR=/home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/hdl/verilog
+INFO: Generating top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip via file impl/misc/top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip.tcl
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2024.2/data/ip'.
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip'...
+INFO: Done generating top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip via file impl/misc/top_module_dmul_64ns_64ns_64_14_full_dsp_1_ip.tcl
+INFO: Generating top_module_sitodp_32s_64_7_no_dsp_1_ip via file impl/misc/top_module_sitodp_32s_64_7_no_dsp_1_ip.tcl
+INFO: [IP_Flow 19-1686] Generating 'Synthesis' target for IP 'top_module_sitodp_32s_64_7_no_dsp_1_ip'...
+INFO: [IP_Flow 19-1686] Generating 'Simulation' target for IP 'top_module_sitodp_32s_64_7_no_dsp_1_ip'...
+INFO: Done generating top_module_sitodp_32s_64_7_no_dsp_1_ip via file impl/misc/top_module_sitodp_32s_64_7_no_dsp_1_ip.tcl
+INFO: Import ports from HDL: /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/hdl/vhdl/top_module.vhd (top_module)
+INFO: Add clock interface ap_clk
+INFO: Add reset interface ap_rst_n
+INFO: Add axi4stream interface im_axis_in
+INFO: Add axi4stream interface current_pos
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository '/tools/Xilinx/Vivado/2024.2/data/ip'.
+INFO: Calling post_process_vitis to specialize IP
+INFO: Calling post_process_sysgen to specialize IP
+Generating sysgen info xml from json file
+INFO: Created IP /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/component.xml
+INFO: Created IP archive /home/marco/Scaricati/test/AXI-based-driver-applications/zedboard/applications/vpa/hls/prj_VPA_IP/solution1/impl/ip/xilinx_com_hls_VPA_IP_1_0.zip
+INFO: [Common 17-206] Exiting Vivado at Mon Oct 19 13:27:11 2026...
