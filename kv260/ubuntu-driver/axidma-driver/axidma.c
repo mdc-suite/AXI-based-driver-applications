@@ -1,17 +1,18 @@
-#include <linux/cdev.h>
-#include <linux/clk.h>
-#include <linux/delay.h>
-#include <linux/device.h>
-#include <linux/dma-mapping.h>
-#include <linux/err.h>
-#include <linux/fs.h>
-#include <linux/io.h>
 #include <linux/module.h>
-#include <linux/of.h>
-#include <linux/of_address.h>
 #include <linux/platform_device.h>
-#include <linux/string.h>
+#include <linux/io.h>
+#include <linux/dma-mapping.h>
+#include <linux/fs.h>
+#include <linux/cdev.h>
+#include <linux/device.h>
 #include <linux/uaccess.h>
+#include <linux/delay.h>
+#include <linux/of.h>
+#include <linux/clk.h>           
+#include <linux/err.h>           
+#include <linux/string.h>
+#include <linux/of_address.h>
+
 
 // #define IMAGE_WIDTH 88
 // #define IMAGE_HEIGHT 142
@@ -19,20 +20,21 @@
 // #define IMAGE_DATA_SIZE (IMAGE_SIZE*4)
 // #define DMA_BUF_SIZE  IMAGE_SIZE
 
+
 // #define DEVICE_NAME "my_dma_chrdev"
 
-#define DMA_REG_SIZE 0x10000
-#define DMA_BUF_SIZE 65535
+#define DMA_REG_SIZE  0x10000
+#define DMA_BUF_SIZE  65535
 
-#define S2MM_DMACR 0x30
-#define S2MM_DMASR 0x34
-#define S2MM_SA 0x48
-#define S2MM_LENGTH 0x58
+#define S2MM_DMACR   0x30
+#define S2MM_DMASR   0x34
+#define S2MM_SA      0x48
+#define S2MM_LENGTH  0x58
 
-#define MM2S_DMACR 0x00
-#define MM2S_DMASR 0x04
-#define MM2S_SA 0x18
-#define MM2S_LENGTH 0x28
+#define MM2S_DMACR   0x00
+#define MM2S_DMASR   0x04
+#define MM2S_SA      0x18
+#define MM2S_LENGTH  0x28
 
 // #define ACC_BASE_ADDR  0xB0000000
 // #define ACC_SIZE 0x10000
@@ -55,16 +57,13 @@
 
 #define DMA_MAGIC 'D'
 
-#define IOCTL_SELECT_CHANNEL _IOW(DMA_MAGIC, 0, int)
-#define IOCTL_READ_STATUS_REGISTER _IOR(DMA_MAGIC, 4, unsigned __user int *)
-#define IOCTL_DMA_WRITE_BUFFER _IOW(DMA_MAGIC, 1, unsigned char __user *)
-#define IOCTL_DMA_READ_BUFFER _IOR(DMA_MAGIC, 2, unsigned char __user *)
+#define IOCTL_SELECT_CHANNEL     _IOW(DMA_MAGIC, 0, int)
+#define IOCTL_READ_STATUS_REGISTER     _IOR(DMA_MAGIC, 4, unsigned __user int*)
+#define IOCTL_DMA_WRITE_BUFFER   _IOW(DMA_MAGIC, 1, unsigned char __user *)
+#define IOCTL_DMA_READ_BUFFER    _IOR(DMA_MAGIC, 2, unsigned char __user *)
 #define IOCTL_DMA_START_TRANSFER _IOW(DMA_MAGIC, 3, size_t)
 #define IOCTL_DMA_RESET _IOW(DMA_MAGIC, 5, size_t)
 #define IOCTL_DMA_RESET_ALL _IOW(DMA_MAGIC, 6, size_t)
-
-#define IOCTL_AXILITE_WRITE_REG _IOW(DMA_MAGIC, 7, struct axi_lite_reg_io)
-#define IOCTL_AXILITE_READ_REG _IOWR(DMA_MAGIC, 8, struct axi_lite_reg_io)
 
 #define DMA_SYNC_TIMEOUT 10000
 #define SYNC_TIMEOUT_ERROR -2
@@ -73,31 +72,23 @@ const char MM2S_string[5] = "MM2S";
 const char S2MM_string[5] = "S2MM";
 
 struct dma_channel_info {
-  struct device_node *node;
-  void __iomem *regs;
-  void __iomem *dma_virt;
-  dma_addr_t dma_phys;
-  u32 datawidth;
-  u32 device_id;
-  size_t dma_size;
-  size_t transfer_len;   // current transfer length in bytes
-  u32 direction; // 0 = S2MM, 1 = MM2S
+    struct device_node *node;
+    void __iomem *regs;
+    void __iomem *dma_virt;
+    dma_addr_t dma_phys;
+    u32 datawidth;
+    u32 device_id;
+    size_t dma_size;
+    u32 direction; //0 = S2MM, 1 = MM2S
 };
-struct axi_lite_info {
-  void __iomem *regs;
-};
-struct axi_lite_reg_io {
-  u32 offset;
-  u32 value;
-};
-struct uniss_dma_dev {
-  struct cdev cdev;
-  struct device *dev;
-  struct dma_channel_info *channels;
-  u32 num_channels;
 
-  struct axi_lite_info axi_lite;
+struct uniss_dma_dev {
+    struct cdev cdev;
+    struct device *dev;
+    struct dma_channel_info *channels;
+    u32 num_channels;
 };
+
 
 static struct class *uniss_class;
 static dev_t uniss_dev_t;
@@ -107,264 +98,222 @@ static int selected_channel = 0;
 int sync_dma_to_idle(void *, int);
 int sync_dma_to_halted(void *, int);
 
-int sync_dma_to_idle(void __iomem *regs, int direction) {
-  int i;
-  for (i = 0; i < DMA_SYNC_TIMEOUT; i++) {
-    if ((*(unsigned int *)(regs + (direction == 0 ? S2MM_DMASR : MM2S_DMASR))) &
-        DMA_IDLE_MASK) {
-      return i;
-    }
-  }
-
-  return SYNC_TIMEOUT_ERROR;
-}
-
-int sync_dma_to_halted(void __iomem *regs, int direction) {
-  int i;
-  for (i = 0; i < DMA_SYNC_TIMEOUT; i++) {
-    if ((*(unsigned int *)(regs + (direction == 0 ? S2MM_DMASR : MM2S_DMASR))) &
-        DMA_HALTED_MASK) {
-      return i;
-    }
-  }
-
-  return SYNC_TIMEOUT_ERROR;
-}
-
-// File operations start here
-
-static int uniss_open(struct inode *inode, struct file *filp) {
-  struct uniss_dma_dev *ud =
-      container_of(inode->i_cdev, struct uniss_dma_dev, cdev);
-  filp->private_data = ud;
-  return 0;
-}
-
-static long uniss_ioctl(struct file *file, unsigned int cmd,
-                        unsigned long arg) {
-  struct uniss_dma_dev *ud = file->private_data;
-
-  size_t len;
-
-  unsigned int val;
-  printk(KERN_INFO "ioctl cmd = 0x%x\n", cmd);
-
-  if (selected_channel >= ud->num_channels || selected_channel < 0)
-    selected_channel = 0;
-
-  void __iomem *dma_virt = ud->channels[selected_channel].dma_virt;
-  void __iomem *regs = ud->channels[selected_channel].regs;
-  dma_addr_t dma_phys = ud->channels[selected_channel].dma_phys;
-  u32 direction = ud->channels[selected_channel].direction;
-
-  switch (cmd) {
+int sync_dma_to_idle(void __iomem *regs, int direction){
     int i;
-  case IOCTL_SELECT_CHANNEL:
-    if (arg >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
-    }
-    selected_channel = (int)arg;
-    pr_info("DMA channel set to %d\n", selected_channel);
-    break;
-  case IOCTL_READ_STATUS_REGISTER:
-    printk("entering read status function\n");
-    if (selected_channel >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
-    }
-    printk("reading...\n");
-
-    val = ioread32(regs + (direction ? MM2S_DMASR : S2MM_DMASR));
-
-    if (copy_to_user((u32 __user *)arg, &val, sizeof(val)))
-      return -EFAULT;
-
-    printk("read status\n");
-    break;
-  case IOCTL_DMA_WRITE_BUFFER:
-    if (selected_channel >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
-    }
-    if (ud->channels[selected_channel].direction != 1 /* MM2S */) {
-      pr_err("Cannot write buffer: channel is not MM2S\n");
-      return -EINVAL;
-    }
-
-    if (copy_from_user(dma_virt, (unsigned char __user *)arg, ud->channels[selected_channel].transfer_len)) {
-      pr_err("Failed to copy data from user\n");
-      return -EFAULT;
-    }
-    pr_info("Data copied to DMA buffer (MM2S)\n");
-    break;
-
-  case IOCTL_DMA_READ_BUFFER:
-    if (selected_channel >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
-    }
-    if (ud->channels[selected_channel].direction != 0 /* S2MM */) {
-      pr_err("Cannot read buffer: channel is not S2MM\n");
-      return -EINVAL;
-    }
-
-    if (copy_to_user((unsigned char __user *)arg, dma_virt, ud->channels[selected_channel].transfer_len)) {
-      pr_err("Failed to copy data to user\n");
-      return -EFAULT;
-    }
-    pr_info("Data copied from DMA buffer (S2MM)\n");
-    break;
-
-  case IOCTL_DMA_START_TRANSFER:
-    if (selected_channel >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
-    }
-
-    len = (size_t)arg;
-    if (len > DMA_BUF_SIZE) {
-      pr_err("Transfer length exceeds buffer size\n");
-      return -EINVAL;
-    }
-    ud->channels[selected_channel].transfer_len = len;
-
-    if (direction == 1 /* MM2S */) {
-      pr_info("Starting MM2S DMA transfer of length %zu\n", len);
-
-      printk("Channel %d: test read from dma status reg: 0x%x\n",
-             selected_channel, *(unsigned int *)(regs + MM2S_DMASR));
-
-      if (!(*(unsigned int *)(regs + MM2S_DMASR) & DMA_HALTED_MASK)) {
-        printk("Channel %d: Syncing DMA...\n", selected_channel);
-
-        int res = sync_dma_to_halted(regs, (int)direction);
-
-        if (res == SYNC_TIMEOUT_ERROR) {
-          printk("Channel %d: Sync timeout error\n", selected_channel);
-          return SYNC_TIMEOUT_ERROR;
-        } else {
-          printk("Channel %d: Sync done in %d iterations\n", selected_channel,
-                 res);
+    for(i=0;i<DMA_SYNC_TIMEOUT;i++){
+        if((*(unsigned int *)(regs+(direction==0?S2MM_DMASR:MM2S_DMASR))) & DMA_IDLE_MASK){
+            return i;
         }
-      }
+    }
 
-      iowrite32(START_DMA, regs + MM2S_DMACR);
-      printk("Channel %d: test read from dma ctrl reg after enable: 0x%08x\n",
-             selected_channel, ioread32(regs + MM2S_DMACR));
-      printk("Channel %d: test read from dma status reg after enable: 0x%08x\n",
-             selected_channel, ioread32(regs + MM2S_DMASR));
+    return SYNC_TIMEOUT_ERROR;
 
-      iowrite32(dma_phys, regs + MM2S_SA);
+}
 
-      printk("Channel %d: test read from dma source address reg after write: "
-             "0x%08x\n",
-             selected_channel, ioread32(regs + MM2S_SA));
-
-      iowrite32(len, regs + MM2S_LENGTH);
-
-      printk("Channel %d: test read from dma transfer length reg after write: "
-             "0x%08x\n",
-             selected_channel, ioread32(regs + MM2S_LENGTH));
-
-    } else if (direction == 0 /* S2MM */) {
-      pr_info("Starting S2MM DMA transfer of length %zu\n", len);
-
-      printk("Channel %d: test read from dma status reg: 0x%x\n",
-             selected_channel, *(unsigned int *)(regs + S2MM_DMASR));
-
-      if (!(*(unsigned int *)(regs + S2MM_DMASR) & DMA_HALTED_MASK)) {
-        printk("Channel %d: Syncing DMA...\n", selected_channel);
-
-        int res = sync_dma_to_halted(regs, (int)direction);
-
-        if (res == SYNC_TIMEOUT_ERROR) {
-          printk("Channel %d: Sync timeout error\n", selected_channel);
-          return SYNC_TIMEOUT_ERROR;
-        } else {
-          printk("Channel %d: Sync done in %d iterations\n", selected_channel,
-                 res);
+int sync_dma_to_halted(void __iomem *regs, int direction){
+int i;
+    for(i=0;i<DMA_SYNC_TIMEOUT;i++){
+        if((*(unsigned int *)(regs+(direction==0?S2MM_DMASR:MM2S_DMASR))) & DMA_HALTED_MASK){
+            return i;
         }
-      }
-
-      iowrite32(START_DMA, regs + S2MM_DMACR);
-      printk("Channel %d: test read from dma ctrl reg after enable: 0x%08x\n",
-             selected_channel, ioread32(regs + S2MM_DMACR));
-      printk("Channel %d: test read from dma status reg after enable: 0x%08x\n",
-             selected_channel, ioread32(regs + S2MM_DMASR));
-
-      iowrite32(dma_phys, regs + S2MM_SA);
-
-      printk("Channel %d: test read from dma source address reg after write: "
-             "0x%08x\n",
-             selected_channel, ioread32(regs + S2MM_SA));
-
-      iowrite32(len, regs + S2MM_LENGTH);
-
-      printk("Channel %d: test read from dma transfer length reg after write: "
-             "0x%08x\n",
-             selected_channel, ioread32(regs + S2MM_LENGTH));
-
-    } else {
-      pr_err("Invalid DMA transfer direction selected\n");
-      return -EINVAL;
     }
 
-    break;
-  case IOCTL_DMA_RESET:
-    if (selected_channel >= ud->num_channels || selected_channel < 0) {
-      pr_err("Invalid DMA channel selected\n");
-      return -EINVAL;
+    return SYNC_TIMEOUT_ERROR;
+
+}
+
+//File operations start here
+
+static int uniss_open(struct inode *inode, struct file *filp)
+{
+    struct uniss_dma_dev *ud = container_of(inode->i_cdev, struct uniss_dma_dev, cdev);
+    filp->private_data = ud;
+    return 0;
+}
+
+static long uniss_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
+{
+    struct uniss_dma_dev *ud = file->private_data;
+
+    size_t len;
+
+    unsigned int val;
+
+    if (selected_channel >= ud->num_channels || selected_channel < 0)
+        selected_channel = 0;
+ 
+    void __iomem *dma_virt = ud->channels[selected_channel].dma_virt;
+    void __iomem *regs = ud->channels[selected_channel].regs;
+    dma_addr_t dma_phys = ud->channels[selected_channel].dma_phys;
+    u32 direction = ud->channels[selected_channel].direction;
+
+    switch (cmd) {
+        int i;
+        case IOCTL_SELECT_CHANNEL:
+            if (arg >= ud->num_channels|| selected_channel < 0) {
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+            selected_channel = (int)arg;
+            pr_info("DMA channel set to %d\n", selected_channel);
+            break;
+        case IOCTL_READ_STATUS_REGISTER:
+            printk("entering read status function\n");
+            if(selected_channel >= ud->num_channels || selected_channel < 0){
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+            printk("reading...\n");
+
+            val = ioread32(regs + (direction ? MM2S_DMASR : S2MM_DMASR));
+
+             if (copy_to_user((u32 __user *)arg, &val, sizeof(val)))
+                return -EFAULT;
+
+            printk("read status\n");
+            break;
+        case IOCTL_DMA_WRITE_BUFFER:
+            if(selected_channel >= ud->num_channels || selected_channel < 0){
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+            if (ud->channels[selected_channel].direction != 1 /* MM2S */ ) {
+                pr_err("Cannot write buffer: channel is not MM2S\n");
+                return -EINVAL;
+            }
+
+
+            if (copy_from_user(dma_virt, (unsigned char __user *)arg, DMA_BUF_SIZE)) {
+                pr_err("Failed to copy data from user\n");
+                return -EFAULT;
+            }
+            pr_info("Data copied to DMA buffer (MM2S)\n");
+            break;
+
+        case IOCTL_DMA_READ_BUFFER:
+            if(selected_channel >= ud->num_channels || selected_channel < 0){
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+            if (ud->channels[selected_channel].direction != 0 /* S2MM */ ) {
+                pr_err("Cannot read buffer: channel is not S2MM\n");
+                return -EINVAL;
+            }
+
+
+            if (copy_to_user((unsigned char __user *)arg, dma_virt, DMA_BUF_SIZE)) {
+                pr_err("Failed to copy data to user\n");
+                return -EFAULT;
+            }
+            pr_info("Data copied from DMA buffer (S2MM)\n");
+            break;
+
+        case IOCTL_DMA_START_TRANSFER:
+            if(selected_channel >= ud->num_channels || selected_channel < 0){
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+
+            len = (size_t)arg;
+            if (len > DMA_BUF_SIZE) {
+                pr_err("Transfer length exceeds buffer size\n");
+                return -EINVAL;
+            }
+
+            
+
+            if (direction == 1 /* MM2S */ ) {
+                pr_info("Starting MM2S DMA transfer of length %zu\n", len);
+                
+                printk("Channel %d: test read from dma status reg: 0x%x\n",selected_channel, *(unsigned int *)(regs+MM2S_DMASR));
+
+                if(!(*(unsigned int *)(regs+MM2S_DMASR) & DMA_HALTED_MASK)){
+                    printk("Channel %d: Syncing DMA...\n",selected_channel);
+                    
+                    int res = sync_dma_to_halted(regs,(int)direction);
+
+                    if(res==SYNC_TIMEOUT_ERROR){
+                        printk("Channel %d: Sync timeout error\n", selected_channel);
+                        return SYNC_TIMEOUT_ERROR;
+                    }
+                    else{
+                        printk("Channel %d: Sync done in %d iterations\n",selected_channel,res);
+                    }
+                }
+
+                iowrite32(START_DMA,regs+MM2S_DMACR); 
+                printk("Channel %d: test read from dma ctrl reg after enable: 0x%08x\n",selected_channel,ioread32(regs+MM2S_DMACR));
+                printk("Channel %d: test read from dma status reg after enable: 0x%08x\n",selected_channel,ioread32(regs+MM2S_DMASR));
+
+                iowrite32(dma_phys,regs+MM2S_SA);
+
+                printk("Channel %d: test read from dma source address reg after write: 0x%08x\n",selected_channel,ioread32(regs+MM2S_SA));
+                
+                iowrite32(len,regs+MM2S_LENGTH);
+
+                printk("Channel %d: test read from dma transfer length reg after write: 0x%08x\n",selected_channel,ioread32(regs+MM2S_LENGTH));               
+                
+            } else if (direction == 0 /* S2MM */ ) {
+                pr_info("Starting S2MM DMA transfer of length %zu\n", len);
+
+                
+                
+                printk("Channel %d: test read from dma status reg: 0x%x\n",selected_channel, *(unsigned int *)(regs+S2MM_DMASR));
+
+                if(!(*(unsigned int *)(regs+S2MM_DMASR) & DMA_HALTED_MASK)){
+                    printk("Channel %d: Syncing DMA...\n",selected_channel);
+                    
+                    int res = sync_dma_to_halted(regs,(int)direction);
+
+                    if(res==SYNC_TIMEOUT_ERROR){
+                        printk("Channel %d: Sync timeout error\n", selected_channel);
+                        return SYNC_TIMEOUT_ERROR;
+                    }
+                    else{
+                        printk("Channel %d: Sync done in %d iterations\n",selected_channel,res);
+                    }
+                }
+
+                iowrite32(START_DMA,regs+S2MM_DMACR); 
+                printk("Channel %d: test read from dma ctrl reg after enable: 0x%08x\n",selected_channel,ioread32(regs+S2MM_DMACR));
+                printk("Channel %d: test read from dma status reg after enable: 0x%08x\n",selected_channel,ioread32(regs+S2MM_DMASR));
+
+                iowrite32(dma_phys,regs+S2MM_SA);
+
+                printk("Channel %d: test read from dma source address reg after write: 0x%08x\n",selected_channel,ioread32(regs+S2MM_SA));
+                
+                iowrite32(len,regs+S2MM_LENGTH);
+
+                printk("Channel %d: test read from dma transfer length reg after write: 0x%08x\n",selected_channel,ioread32(regs+S2MM_LENGTH));
+
+            } else {
+                pr_err("Invalid DMA transfer direction selected\n");
+                return -EINVAL;
+            }
+
+            break;
+        case IOCTL_DMA_RESET:
+            if (selected_channel >= ud->num_channels|| selected_channel < 0) {
+                pr_err("Invalid DMA channel selected\n");
+                return -EINVAL;
+            }
+            printk("Resetting DMA...");
+            iowrite32(RESET_DMA,regs+(direction?MM2S_DMACR:S2MM_DMACR));
+            printk("Channel %d: DMA Reset successfully\n",selected_channel);
+            break;
+        case IOCTL_DMA_RESET_ALL:
+            printk("Resetting all DMAs...\n");
+            
+            for(i=0; i<ud->num_channels;i++){
+                iowrite32(RESET_DMA,ud->channels[i].regs+(ud->channels[i].direction?MM2S_DMACR:S2MM_DMACR));
+            }
+            printk("All DMAs have been reset.\n");
+            break;
+        default:
+            return -ENOTTY;
     }
-    printk("Resetting DMA...");
-    iowrite32(RESET_DMA, regs + (direction ? MM2S_DMACR : S2MM_DMACR));
-    printk("Channel %d: DMA Reset successfully\n", selected_channel);
-    break;
-  case IOCTL_DMA_RESET_ALL:
-    printk("Resetting all DMAs...\n");
 
-    for (i = 0; i < ud->num_channels; i++) {
-      iowrite32(RESET_DMA,
-                ud->channels[i].regs +
-                    (ud->channels[i].direction ? MM2S_DMACR : S2MM_DMACR));
-    }
-    printk("All DMAs have been reset.\n");
-    break;
-  case IOCTL_AXILITE_WRITE_REG: {
-    struct axi_lite_reg_io reg;
-    printk(KERN_INFO "AXILITE WRITE matched!\n");
-
-    if (copy_from_user(&reg, (void __user *)arg, sizeof(reg)))
-      return -EFAULT;
-
-    if (!ud->axi_lite.regs)
-      return -ENODEV;
-
-    iowrite32(reg.value, ud->axi_lite.regs + reg.offset);
-
-    break;
-  }
-  case IOCTL_AXILITE_READ_REG: {
-    struct axi_lite_reg_io reg;
-
-    if (copy_from_user(&reg, (void __user *)arg, sizeof(reg)))
-      return -EFAULT;
-
-    if (!ud->axi_lite.regs)
-      return -ENODEV;
-
-    reg.value = ioread32(ud->axi_lite.regs + reg.offset);
-
-    if (copy_to_user((void __user *)arg, &reg, sizeof(reg)))
-      return -EFAULT;
-
-    break;
-  }
-  default:
-    return -ENOTTY;
-  }
-
-  return 0;
+    return 0;
 }
 
 static const struct file_operations uniss_fops = {
@@ -373,200 +322,191 @@ static const struct file_operations uniss_fops = {
     .unlocked_ioctl = uniss_ioctl,
 };
 
-// File operations end here
+//File operations end here
 
-static int uniss_dmas_probe(struct platform_device *pdev) {
-  struct device *dev = &pdev->dev;
-  struct device_node *np = dev->of_node;
-  struct device_node *dma_np;
-  struct device_node *chan_np;
-  struct dma_channel_info *channels;
-  struct device_node *axi_lite_np;
-  int count, i, chan_count = 0;
+static int uniss_dmas_probe(struct platform_device *pdev)
+{
+    struct device *dev = &pdev->dev;
+    struct device_node *np = dev->of_node;
+    struct device_node *dma_np;
+    struct device_node *chan_np;
+    struct dma_channel_info *channels;
+    int count, i, chan_count = 0;
 
-  printk("Probing DMAs...\n");
-  printk("Setting mask...\n");
+    
+    printk("Probing DMAs...\n");
+    printk("Setting mask...\n");
 
-  if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32))) {
-    dev_err(&pdev->dev, "32-bit DMA not supported\n");
-    printk("32-bit DMA not supported\n");
-    return -EIO;
-  }
-
-  count = of_count_phandle_with_args(np, "dev-handles", NULL);
-  if (count <= 0) {
-    dev_err(dev, "No dev-handles found\n");
-    printk("No dev-handles found\n");
-    return -EINVAL;
-  }
-
-  printk("Found %d DMA devices\n", count);
-
-  channels = devm_kzalloc(dev, sizeof(*channels) * (count + 1), GFP_KERNEL);
-  if (!channels)
-    return -ENOMEM;
-
-  printk("Parsing dev-handles...\n");
-
-  void __iomem *controller_regs;
-
-  for (i = 0; i < count; i++) {
-    dma_np = of_parse_phandle(np, "dev-handles", i);
-    if (!dma_np) {
-      dev_warn(dev, "Failed to parse dev-handles[%d]\n", i);
-      printk("Failed to parse dev-handles[%d]\n", i);
-      continue;
+    if (dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(32))) {
+        dev_err(&pdev->dev, "32-bit DMA not supported\n");
+        printk("32-bit DMA not supported\n");
+        return -EIO;
     }
 
-    // Iterate over children (channels)
+    count = of_count_phandle_with_args(np, "dev-handles", NULL);
+    if (count <= 0) {
+        dev_err(dev, "No dev-handles found\n");
+        printk("No dev-handles found\n");
+        return -EINVAL;
+    }
 
-    controller_regs = NULL;
+    printk("Found %d DMA devices\n", count);
 
-    for_each_child_of_node(dma_np, chan_np) {
-      u32 mm2s;
+    channels = devm_kzalloc(dev, sizeof(*channels) * (count + 1), GFP_KERNEL);
+    if (!channels)
+        return -ENOMEM;
 
-      if (of_property_read_u32(chan_np, "mm2s", &mm2s))
-        continue;
-
-      // if (mm2s != 1)
-      //     continue;  // We only care about MM2S (TX) channels
-
-      // Optional: read other properties
-      of_property_read_u32(chan_np, "xlnx,datawidth",
-                           &channels[chan_count].datawidth);
-      of_property_read_u32(chan_np, "xlnx,device-id",
-                           &channels[chan_count].device_id);
-
-      // Map registers if needed — optional: use parent
-      channels[chan_count].node = chan_np;
-
-      if (!controller_regs) {
-        controller_regs = of_iomap(dma_np, 0);
-        if (!controller_regs) {
-          dev_err(dev, "Failed to map DMA controller registers\n");
-          printk("Failed to map DMA controller registers\n");
-          continue;
+    printk("Parsing dev-handles...\n");
+    
+    void __iomem *controller_regs;
+    
+    for (i = 0; i < count; i++) {
+        dma_np = of_parse_phandle(np, "dev-handles", i);
+        if (!dma_np) {
+            dev_warn(dev, "Failed to parse dev-handles[%d]\n", i);
+            printk("Failed to parse dev-handles[%d]\n", i);
+            continue;
         }
-      }
 
-      channels[chan_count].regs = controller_regs;
+        // Iterate over children (channels)
 
-      channels[chan_count].direction = mm2s;
+        controller_regs = NULL;
 
-      printk("Found %s channel... Channel %d: datawidth=%u device-id=%u\n",
-             mm2s ? MM2S_string : S2MM_string, chan_count,
-             channels[chan_count].datawidth, channels[chan_count].device_id);
+        for_each_child_of_node(dma_np, chan_np) {
+            u32 mm2s;
 
-      printk("Allocating memory for channel %d...\n", chan_count);
-      channels[chan_count].dma_size = DMA_BUF_SIZE;
-      channels[chan_count].dma_virt =
-          dma_alloc_coherent(dev, channels[chan_count].dma_size,
-                             &channels[chan_count].dma_phys, GFP_KERNEL);
+            if (of_property_read_u32(chan_np, "mm2s", &mm2s))
+                continue;
 
-      if (!channels[chan_count].dma_virt) {
-        dev_err(dev, "Failed to allocate DMA buffer for channel %d\n",
-                chan_count);
-        printk("Failed to allocate DMA buffer for channel %d\n", chan_count);
-        iounmap(channels[chan_count].regs); // Rollback what we can
-        channels[chan_count].regs = NULL;
-        continue;
-      }
+            // if (mm2s != 1)
+            //     continue;  // We only care about MM2S (TX) channels
 
-      printk(
-          "DMA buffer allocated for channel %d: virt=%p, phys=%pad, size=%zu\n",
-          chan_count, channels[chan_count].dma_virt,
-          &channels[chan_count].dma_phys, channels[chan_count].dma_size);
-      chan_count++;
+            // Optional: read other properties
+            of_property_read_u32(chan_np, "xlnx,datawidth", &channels[chan_count].datawidth);
+            of_property_read_u32(chan_np, "xlnx,device-id", &channels[chan_count].device_id);
+
+            // Map registers if needed — optional: use parent
+            channels[chan_count].node = chan_np;
+
+            if (!controller_regs) {
+                controller_regs = of_iomap(dma_np, 0);
+                if (!controller_regs) {
+                    dev_err(dev, "Failed to map DMA controller registers\n");
+                    printk("Failed to map DMA controller registers\n");
+                    continue;
+                }
+            }
+
+            channels[chan_count].regs = controller_regs;
+
+            channels[chan_count].direction = mm2s;
+
+            printk("Found %s channel... Channel %d: datawidth=%u device-id=%u\n",
+                     mm2s?MM2S_string:S2MM_string,
+                     chan_count,
+                     channels[chan_count].datawidth,
+                     channels[chan_count].device_id);
+
+            printk("Allocating memory for channel %d...\n",chan_count);
+            channels[chan_count].dma_size = DMA_BUF_SIZE;
+            channels[chan_count].dma_virt = dma_alloc_coherent(dev,
+                channels[chan_count].dma_size,
+                &channels[chan_count].dma_phys,
+                GFP_KERNEL);
+            
+            if (!channels[chan_count].dma_virt) {
+                dev_err(dev, "Failed to allocate DMA buffer for channel %d\n", chan_count);
+                printk("Failed to allocate DMA buffer for channel %d\n", chan_count);
+                iounmap(channels[chan_count].regs); // Rollback what we can
+                channels[chan_count].regs = NULL;
+                continue;
+            }
+
+            printk("DMA buffer allocated for channel %d: virt=%p, phys=%pad, size=%zu\n",
+                   chan_count,
+                   channels[chan_count].dma_virt,
+                   &channels[chan_count].dma_phys,
+                   channels[chan_count].dma_size);
+            chan_count++;
+        }
+
+        of_node_put(dma_np);  // drop reference
     }
 
-    of_node_put(dma_np); // drop reference
-  }
+    printk("Total channels probed: %d\n", chan_count);
 
-  printk("Total channels probed: %d\n", chan_count);
+    // You can now store `channels[]` somewhere or attach to driver data
 
-  // You can now store `channels[]` somewhere or attach to driver data
+    uniss_dev = devm_kzalloc(dev, sizeof(*uniss_dev), GFP_KERNEL);
+    uniss_dev->channels = channels;
+    uniss_dev->num_channels = chan_count;
+    uniss_dev->dev = dev;
 
-  uniss_dev = devm_kzalloc(dev, sizeof(*uniss_dev), GFP_KERNEL);
-  if (!uniss_dev)
-    return -ENOMEM;
-  uniss_dev->channels = channels;
-  uniss_dev->num_channels = chan_count;
-  uniss_dev->dev = dev;
+    alloc_chrdev_region(&uniss_dev_t, 0, 1, "uniss_dma");
+    cdev_init(&uniss_dev->cdev, &uniss_fops);
+    cdev_add(&uniss_dev->cdev, uniss_dev_t, 1);
+    uniss_class = class_create(THIS_MODULE,"uniss_dma");
+    device_create(uniss_class, NULL, uniss_dev_t, NULL, "uniss_dma");
 
-  /*---------------------------------------------------------*/
-  /* Map the accelerator AXI-Lite registers                  */
-  /*---------------------------------------------------------*/
-  axi_lite_np = of_parse_phandle(np, "axi_lite-handle", 0);
-  if (!axi_lite_np)
-    return -EINVAL;
-
-  uniss_dev->axi_lite.regs = of_iomap(axi_lite_np, 0);
-  of_node_put(axi_lite_np);
-
-  if (!uniss_dev->axi_lite.regs) {
-    dev_err(dev, "Failed to map AXI-Lite registers\n");
-    return -ENOMEM;
-  }
-
-  alloc_chrdev_region(&uniss_dev_t, 0, 1, "uniss_dma");
-  cdev_init(&uniss_dev->cdev, &uniss_fops);
-  cdev_add(&uniss_dev->cdev, uniss_dev_t, 1);
-  uniss_class = class_create(THIS_MODULE, "uniss_dma");
-  device_create(uniss_class, NULL, uniss_dev_t, NULL, "uniss_dma");
-
-  platform_set_drvdata(pdev, uniss_dev);
-
-  return 0;
+    platform_set_drvdata(pdev, uniss_dev);
+    
+    
+    return 0;
 }
 
-static int uniss_dmas_remove(struct platform_device *pdev) {
-  printk("Removing DMAs...\n");
-  struct uniss_dma_dev *ud = platform_get_drvdata(pdev);
+static int uniss_dmas_remove(struct platform_device *pdev)
+{
+    printk("Removing DMAs...\n");
+    struct uniss_dma_dev *ud = platform_get_drvdata(pdev);
 
-  struct dma_channel_info *channels = ud->channels;
-  int i;
+    
+    struct dma_channel_info *channels = ud->channels;
+    int i;
 
-  if (!channels)
+    if (!channels)
+        return 0;
+
+    for (i = 0; channels[i].node; i++) {
+        if (channels[i].regs)
+            iounmap(channels[i].regs);  // Unmap any mapped register regions
+
+        if (channels[i].dma_virt)
+            dma_free_coherent(&pdev->dev,
+                          channels[i].dma_size,
+                          channels[i].dma_virt,
+                          channels[i].dma_phys);
+
+        // of_node_put is not needed for child nodes if not retained
+        // but if you called of_node_get() elsewhere, release here
+    }
+
+
+    printk("DMAs removed successfully.\n");
+    
+    device_destroy(uniss_class, uniss_dev_t);
+    class_destroy(uniss_class);
+    cdev_del(&ud->cdev);
+    unregister_chrdev_region(uniss_dev_t, 1);
+    
+    printk("Character device removed successfully.\n");
+
     return 0;
-
-  for (i = 0; channels[i].node; i++) {
-    if (channels[i].regs)
-      iounmap(channels[i].regs); // Unmap any mapped register regions
-
-    if (channels[i].dma_virt)
-      dma_free_coherent(&pdev->dev, channels[i].dma_size, channels[i].dma_virt,
-                        channels[i].dma_phys);
-
-    // of_node_put is not needed for child nodes if not retained
-    // but if you called of_node_get() elsewhere, release here
-  }
-  if (ud->axi_lite.regs)
-    iounmap(ud->axi_lite.regs);
-  printk("DMAs removed successfully.\n");
-
-  device_destroy(uniss_class, uniss_dev_t);
-  class_destroy(uniss_class);
-  cdev_del(&ud->cdev);
-  unregister_chrdev_region(uniss_dev_t, 1);
-
-  printk("Character device removed successfully.\n");
-
-  return 0;
 }
 
 static const struct of_device_id uniss_dmas_of_match[] = {
-    {.compatible = "uniss,dmas"}, {/* sentinel */}};
+    { .compatible = "uniss,dmas" },
+    { /* sentinel */ }
+};
 
 MODULE_DEVICE_TABLE(of, uniss_dmas_of_match);
 
 static struct platform_driver uniss_dmas_driver = {
-    .probe = uniss_dmas_probe,
+    .probe  = uniss_dmas_probe,
     .remove = uniss_dmas_remove,
-    .driver =
-        {
-            .name = "uniss-dmas",
-            .of_match_table = uniss_dmas_of_match,
-        },
+    .driver = {
+        .name = "uniss-dmas",
+        .of_match_table = uniss_dmas_of_match,
+    },
 };
 
 module_platform_driver(uniss_dmas_driver);
@@ -574,3 +514,4 @@ module_platform_driver(uniss_dmas_driver);
 MODULE_LICENSE("GPL");
 MODULE_AUTHOR("Giuseppe Satta");
 MODULE_DESCRIPTION("DMA aggregator probing TX channels via dev-handles");
+

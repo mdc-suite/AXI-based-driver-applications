@@ -3,105 +3,63 @@
 
 ## Overview
 
-This Linux kernel module provides a character device interface for interacting with AXI DMA hardware and AXI-Lite peripherals on Xilinx Zynq and Zynq UltraScale+ MPSoC platforms.
+This Linux kernel module provides a character device interface for interacting with AXI DMA hardware on a platform such as Xilinx Zynq or ZynqMP. It supports multiple DMA channels, both **MM2S** (memory-to-stream) and **S2MM** (stream-to-memory), probed from the device tree using `dev-handles`.
 
-The driver automatically discovers multiple AXI DMA channels from the Device Tree using the `dev-handles` property and maps an accelerator AXI-Lite register space using the `axi_lite-handle` property.
-
-Through the `/dev/uniss_dma` character device, user-space applications can:
-
+The module allows user-space applications to:
 - Select a DMA channel.
-- Transfer data to and from DMA buffers.
-- Start DMA transfers.
+- Transfer data to/from DMA buffers.
+- Start transfers.
 - Reset individual or all DMA engines.
 - Read DMA status registers.
-- Read accelerator registers through AXI-Lite.
-- Write accelerator registers through AXI-Lite.
-
-This provides a single software interface for both high-speed AXI DMA transfers and low-bandwidth accelerator configuration.
 
 ## Features
 
-- Automatic discovery of multiple AXI DMA channels from the Device Tree.
-- Support for both MM2S and S2MM DMA channels.
-- Coherent DMA buffer allocation for each channel.
-- Character device interface (`/dev/uniss_dma`).
-- AXI-Lite register access through ioctl commands.
-- Userspace control of DMA transfers and accelerator configuration using a single driver.
+- Multi-channel DMA support via device tree parsing.
+- Coherent memory allocation for each DMA buffer.
+- Character device interface with `ioctl` operations.
 
 ## Device Tree Requirements
 
-The driver expects a platform node with two properties:
-
-- `dev-handles` — list of AXI DMA controller phandles.
-- `axi_lite-handle` — phandle to the accelerator AXI-Lite slave.
-
-Each DMA controller should define its MM2S and/or S2MM channels.
+Ensure the platform device includes the `dev-handles` property, which is a list of phandles to DMA controller nodes. Each controller should define child nodes for each channel with at least:
+```dts
+mm2s = <0|1>;  // 1 for MM2S, 0 for S2MM
+xlnx,datawidth = <...>;
+xlnx,device-id = <...>;
+```
 
 Example:
-
 ```dts
-axi_dma_0: dma@...
-{
+dma: dma-controller@... {
     compatible = "xlnx,axi-dma";
+    reg = <...>;
+    #address-cells = <2>;
+    #size-cells = <2>;
 
-    mm2s_channel {
+    channel@0 {
         mm2s = <1>;
         xlnx,datawidth = <32>;
         xlnx,device-id = <0>;
     };
 
-    s2mm_channel {
+    channel@1 {
         mm2s = <0>;
         xlnx,datawidth = <32>;
         xlnx,device-id = <1>;
     };
 };
 
-s_accelerator_0: s_accelerator@a0010000 {
-    compatible = "unica,s-accelerator";
-    reg = <0x0 0xa0010000 0x0 0x10000>;
-};
-
 dmas {
-    compatible = "uniss,dmas";
-    status = "okay";
-
-    dev-handles = <&axi_dma_0 &axi_dma_1 &axi_dma_2>;
-
-    axi_lite-handle = <&s_accelerator_0>;
+	compatible = "uniss,dmas";  //The compatible string has to be exactly as this one for the driver to function. 
+	status = "okay"; 
+	dev-handles = <&dma>;
 };
 ```
 
-The `axi_lite-handle` property allows the driver to map the accelerator register space during probe, eliminating the need for user-space access through `/dev/mem`.
+Compile with:
 
-
-
-## Environment setup
-The `set_env.sh` script automates the entire process of compiling and installing the AXI DMA driver on your system.
-
-### What the script does:
-1.  **Repository Cloning**: Downloads the latest version of the `AXI-based-drivers` repository directly from GitHub.
-2.  **Dependency Installation**: Runs `install_libs.sh` to install the necessary system libraries and kernel headers required for compilation.
-3.  **Driver Compilation**: Navigates to the `axidma-driver` directory and builds the source code using the `make` command.
-4.  **Module Installation**:
-    * Creates the required directory in `/lib/modules/` for extra kernel modules.
-    * Copies the compiled binary file (`axidma.ko`) to the system module path.
-    * Updates the kernel module dependency list using `depmod`.
-5.  **Persistence at Boot**: Configures the system to automatically load the `axidma` module during every boot by creating a configuration file in `/etc/modules-load.d/`.
-6.  **Loading and Verification**: Immediately loads the driver into the kernel using `modprobe` and displays the status via `lsmod` to confirm a successful installation.
----
-
-## Script Usage
-To set up your environment, run the following commands in your terminal:
 ```bash
-# Make the script executable
-chmod +x set_env.sh
-
-# Start the installation
-./set_env.sh
+dtc pl.dtsi -o pl.dtbo
 ```
-
-Alternatively, you can build the module yourself using these steps.
 
 ## Building the Module
 
@@ -149,125 +107,63 @@ Once loaded, the module creates a character device:
 ```
 /dev/uniss_dma
 ```
-## `ioctl` Commands
 
-| Command | Code | Description |
-|---------|------|-------------|
-| `IOCTL_SELECT_CHANNEL` | `_IOW('D',0,int)` | Select active DMA channel |
-| `IOCTL_DMA_WRITE_BUFFER` | `_IOW('D',1,unsigned char *)` | Copy data into an MM2S DMA buffer |
-| `IOCTL_DMA_READ_BUFFER` | `_IOR('D',2,unsigned char *)` | Copy data from an S2MM DMA buffer |
-| `IOCTL_DMA_START_TRANSFER` | `_IOW('D',3,size_t)` | Start a DMA transfer |
-| `IOCTL_READ_STATUS_REGISTER` | `_IOR('D',4,unsigned int *)` | Read DMA status register |
-| `IOCTL_DMA_RESET` | `_IOW('D',5,size_t)` | Reset the selected DMA channel |
-| `IOCTL_DMA_RESET_ALL` | `_IOW('D',6,size_t)` | Reset all DMA channels |
-| `IOCTL_AXILITE_WRITE_REG` | `_IOW('D',7,struct axi_lite_reg_io)` | Write an AXI-Lite register |
-| `IOCTL_AXILITE_READ_REG` | `_IOWR('D',8,struct axi_lite_reg_io)` | Read an AXI-Lite register |
+### `ioctl` Commands
 
-The DMA channel numbering follows the order specified in the Device Tree.
+| Command                        | Code                         | Direction | Description                                   |
+|-------------------------------|------------------------------|-----------|-----------------------------------------------|
+| `IOCTL_SELECT_CHANNEL`        | `_IOW('D', 0, int)`          | write     | Select active channel (by index)              |
+| `IOCTL_DMA_WRITE_BUFFER`      | `_IOW('D', 1, unsigned char *)` | write | Write data to MM2S buffer                     |
+| `IOCTL_DMA_READ_BUFFER`       | `_IOR('D', 2, unsigned char *)` | read  | Read data from S2MM buffer                    |
+| `IOCTL_DMA_START_TRANSFER`    | `_IOW('D', 3, size_t)`       | write     | Start DMA transfer of given length           |
+| `IOCTL_READ_STATUS_REGISTER`  | `_IOR('D', 4, unsigned int *)` | read     | Read current DMA status register              |
+| `IOCTL_DMA_RESET`             | `_IOW('D', 5, size_t)`       | write     | Reset the selected DMA channel                |
+| `IOCTL_DMA_RESET_ALL`         | `_IOW('D', 6, size_t)`       | write     | Reset all DMA channels                        |
 
-## AXI-Lite Register Access
+*The order of the channel numbers is the same as the one specified in the device-tree.
 
-The driver exposes the accelerator AXI-Lite register space through two ioctl commands.
-
-Applications exchange register information using:
-
-```c
-struct axi_lite_reg_io {
-    uint32_t offset;
-    uint32_t value;
-};
-```
-
-Writing a register:
-
-```c
-struct axi_lite_reg_io reg;
-
-reg.offset = 0x04;
-reg.value  = 128;
-
-ioctl(fd, IOCTL_AXILITE_WRITE_REG, &reg);
-```
-
-Reading a register:
-
-```c
-struct axi_lite_reg_io reg;
-
-reg.offset = 0x00;
-
-ioctl(fd, IOCTL_AXILITE_READ_REG, &reg);
-
-printf("REG0 = 0x%08X\n", reg.value);
-```
-
-This interface allows user-space applications to configure hardware accelerators without requiring direct `/dev/mem` access.
-## Usage Example (C)
+## Usage Example (in C)
 
 ```c
 int fd = open("/dev/uniss_dma", O_RDWR);
 
-/* Configure accelerator through AXI-Lite */
-
-struct axi_lite_reg_io reg;
-
-reg.offset = ACCEL_REG1;
-reg.value  = out_pixels;
-ioctl(fd, IOCTL_AXILITE_WRITE_REG, &reg);
-
-reg.offset = ACCEL_REG0;
-reg.value  = (kernel << 24) | 0x1;
-ioctl(fd, IOCTL_AXILITE_WRITE_REG, &reg);
-
-/* Prepare output DMA */
-
-ioctl(fd, IOCTL_SELECT_CHANNEL, 2);
-ioctl(fd, IOCTL_DMA_START_TRANSFER, out_pixels * 4);
-
-/* Send configuration */
-
-ioctl(fd, IOCTL_SELECT_CHANNEL, 1);
-ioctl(fd, IOCTL_DMA_WRITE_BUFFER, cfg);
-ioctl(fd, IOCTL_DMA_START_TRANSFER, 4);
-
-/* Send image */
-
+// Select channel 0
 ioctl(fd, IOCTL_SELECT_CHANNEL, 0);
-ioctl(fd, IOCTL_DMA_WRITE_BUFFER, img);
-ioctl(fd, IOCTL_DMA_START_TRANSFER, image_size);
 
-/* Read processed image */
+// Write data to MM2S buffer
+ioctl(fd, IOCTL_DMA_WRITE_BUFFER, user_buffer);
 
-ioctl(fd, IOCTL_SELECT_CHANNEL, 2);
-ioctl(fd, IOCTL_DMA_READ_BUFFER, output);
+// Start transfer
+ioctl(fd, IOCTL_DMA_START_TRANSFER, length);
+
+//Select channel 1
+ioctl(fd, IOCTL_SELECT_CHANNEL, 1);
+
+//Start transfer
+ioctl(fd, IOCTL_DMA_START_TRANSFER, length);
+
+// Read data from S2MM buffer
+ioctl(fd, IOCTL_DMA_READ_BUFFER, user_buffer_out);
+
+// Read status
+unsigned int status;
+ioctl(fd, IOCTL_READ_STATUS_REGISTER, &status);
 ```
 
-A complete userspace example is provided in `acc_test_edgedetect.c`.
+*Note that this example isn't functional and is only for demonstration purposes. A functional userspace example is provided in 'dma_test.c' .
 
 ## Debugging
 
-The driver includes extensive `printk()` logging for DMA and AXI-Lite operations.
-
-Useful commands include:
-
-```bash
-dmesg | grep uniss
-dmesg | grep DMA
-```
-
-Typical messages include:
-
-- DMA channel discovery
-- DMA buffer allocation
-- DMA transfer start
-- DMA reset
-- AXI-Lite register reads and writes
-- Device probe and removal
+This module includes extensive `printk` logging to assist with debugging:
+- Use `dmesg` to view messages about device probing, memory allocation, and DMA register access.
+- You may observe messages like:
+  - `"Starting MM2S DMA transfer..."` or
+  - `"DMA buffer allocated for channel..."`
 
 ## Known Limitations
 
 - The module assumes `DMA_BIT_MASK(32)` support.
-- No interrupt support — relies on polling DMA status.
+- No interrupt support — relies on polling DMA status. May be added in the future.
 - Currently no support for VDMA or Multi-channel DMA.
 
 ## License
@@ -276,8 +172,4 @@ Typical messages include:
 
 ## Author
 
-**Giuseppe Satta** — Original author and maintainer of the AXI DMA kernel module.
-
-## Contributor
-
-**Mohammad Cheshfar** — Added AXI-Lite register support, extended ioctl interface, Device Tree integration, userspace applications, and documentation.
+**Giuseppe Satta** — Maintainer and original author of this DMA aggregator kernel module.
