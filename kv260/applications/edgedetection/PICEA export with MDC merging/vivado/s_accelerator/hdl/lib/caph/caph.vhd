@@ -23,12 +23,8 @@ package core is
   function cond(e1: boolean; e2: std_logic_vector; e3: std_logic_vector) return std_logic_vector;
   function eq(e1: signed; e2: signed) return unsigned;
   function eq(e1: unsigned; e2: unsigned) return unsigned;
-  function mul(e1: signed; e2: signed) return signed;       -- signed<m> * signed<n> -> signed<max(m,n)>
-  function mul(e1: unsigned; e2: unsigned) return unsigned; -- unsigned<m> * unsigned<n> -> unsigned<max(m,n)>
-  -- IEEE "*" operator has type : (un)signed<m> * (un)signed<n> -> (un)signed<m+n>>
-  function ext_add (e1: unsigned; e2: unsigned) return unsigned; -- unsigned<m> + unsigned<n> -> unsigned<max(m,n)+1>
-  function ext_add (e1: signed; e2: signed) return signed;       -- signed<m> + signed<n> -> signed<max(m,n)+1>
-  -- IEEE "+" operator has type : (un)signed<m> * (un)signed<n> -> (un)signed<max(m,n)>
+  function mul(e1: signed; e2: signed) return signed;
+  function mul(e1: unsigned; e2: unsigned) return unsigned;
   function to_std_logic_vector(e: unsigned; s: natural) return std_logic_vector;
   function to_std_logic_vector(e: signed; s: natural) return std_logic_vector;
   function to_std_logic_vector(e: boolean; s: natural) return std_logic_vector;
@@ -260,18 +256,6 @@ package body core is
         constant length: INTEGER := maximum(e1'length, e2'length);
     begin
         return resize(e1*e2, length);
-    end;
-
-  function ext_add (e1: unsigned; e2: unsigned) return unsigned is
-        constant length: INTEGER := maximum(e1'length,e2'length)+1;
-    begin
-        return resize(e1,length) + resize(e2,length);
-    end;
-
-  function ext_add (e1: signed; e2: signed) return signed is
-        constant length: INTEGER := maximum(e1'length,e2'length)+1;
-    begin
-        return resize(e1,length) + resize(e2,length);
     end;
 
   function to_std_logic_vector(e: unsigned; s:natural) return std_logic_vector is

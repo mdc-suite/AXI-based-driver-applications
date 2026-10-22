@@ -14,15 +14,15 @@ use work.edgeDetectionOk_globals.all;
 
 entity abs_sum is
    port (
-    in_gx_empty: in std_logic;
-    in_gx: in std_logic_vector(13 downto 0);
-    in_gx_rd: out std_logic;
-    in_gy_empty: in std_logic;
-    in_gy: in std_logic_vector(13 downto 0);
-    in_gy_rd: out std_logic;
-    out_g_full: in std_logic;
-    out_g: out std_logic_vector(13 downto 0);
-    out_g_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(13 downto 0);
+    arg0_rd: out std_logic;
+    arg1_empty: in std_logic;
+    arg1: in std_logic_vector(13 downto 0);
+    arg1_rd: out std_logic;
+    arg2_full: in std_logic;
+    arg2: out std_logic_vector(13 downto 0);
+    arg2_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -30,23 +30,23 @@ end abs_sum;
 
 architecture FSM of abs_sum is
 begin
-  comb: process(in_gx, in_gx_empty, in_gy, in_gy_empty, out_g_full)
+  comb: process(arg0, arg0_empty, arg1, arg1_empty, arg2_full)
     variable p_gx : signed(13 downto 0);
     variable p_gy : signed(13 downto 0);
   begin
-    -- in_gy.rdy, in_gx.rdy, out_g.rdy / p_gy=in_gy, p_gx=in_gx, wr(out_g,fabs(p_gx)+fabs(p_gy))
-    if in_gy_empty='0' and in_gx_empty='0' and out_g_full='0' then
-      p_gy := from_std_logic_vector(in_gy,14);
-      in_gy_rd <= '1';
-      p_gx := from_std_logic_vector(in_gx,14);
-      in_gx_rd <= '1';
-      out_g <= std_logic_vector((fabs(p_gx)) + (fabs(p_gy)));
-      out_g_wr <= '1';
+    -- arg1.rdy, arg0.rdy, arg2.rdy / p_gy=arg1, p_gx=arg0, wr(arg2,fabs(p_gx)+fabs(p_gy))
+    if arg1_empty='0' and arg0_empty='0' and arg2_full='0' then
+      p_gy := from_std_logic_vector(arg1,14);
+      arg1_rd <= '1';
+      p_gx := from_std_logic_vector(arg0,14);
+      arg0_rd <= '1';
+      arg2 <= std_logic_vector((fabs(p_gx)) + (fabs(p_gy)));
+      arg2_wr <= '1';
     else
-      in_gx_rd <= '0';
-      in_gy_rd <= '0';
-      out_g_wr <= '0';
-      out_g <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_rd <= '0';
+      arg2_wr <= '0';
+      arg2 <= (others => 'X');
     end if;
   end process;
   seq: process(clock, reset)

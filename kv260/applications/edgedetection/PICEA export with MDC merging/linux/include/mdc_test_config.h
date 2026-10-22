@@ -24,9 +24,9 @@ struct mdc_test_port {
 struct mdc_test_mode { unsigned id; const char *name; };
 
 static const struct mdc_test_port mdc_test_ports[MDC_TEST_CHANNELS] = {
-    {"in_pel", 0u, 1u, 8u, 0u},
-    {"in_size", 1u, 1u, 6u, 0u},
-    {"out_pel", 2u, 0u, 8u, 4u}
+    {"in0", 0u, 1u, 6u, 0u},
+    {"in1", 1u, 1u, 8u, 0u},
+    {"out0", 2u, 0u, 8u, 4u}
 };
 
 static const struct mdc_test_mode mdc_test_modes[MDC_TEST_MODE_COUNT] = {

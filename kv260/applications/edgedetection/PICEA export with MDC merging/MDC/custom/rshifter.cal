@@ -1,8 +1,0 @@
-package custom;
-
-actor rshifter()
-  int(size=16) arg0
-  ==>
-  int(size=16) arg1
-:
-end

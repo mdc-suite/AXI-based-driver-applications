@@ -14,36 +14,36 @@ use work.edgeDetectionOk_globals.all;
 
 entity sobel_y is
    port (
-    pel00_empty: in std_logic;
-    pel00: in std_logic_vector(7 downto 0);
-    pel00_rd: out std_logic;
-    pel01_empty: in std_logic;
-    pel01: in std_logic_vector(7 downto 0);
-    pel01_rd: out std_logic;
-    pel02_empty: in std_logic;
-    pel02: in std_logic_vector(7 downto 0);
-    pel02_rd: out std_logic;
-    pel10_empty: in std_logic;
-    pel10: in std_logic_vector(7 downto 0);
-    pel10_rd: out std_logic;
-    pel11_empty: in std_logic;
-    pel11: in std_logic_vector(7 downto 0);
-    pel11_rd: out std_logic;
-    pel12_empty: in std_logic;
-    pel12: in std_logic_vector(7 downto 0);
-    pel12_rd: out std_logic;
-    pel20_empty: in std_logic;
-    pel20: in std_logic_vector(7 downto 0);
-    pel20_rd: out std_logic;
-    pel21_empty: in std_logic;
-    pel21: in std_logic_vector(7 downto 0);
-    pel21_rd: out std_logic;
-    pel22_empty: in std_logic;
-    pel22: in std_logic_vector(7 downto 0);
-    pel22_rd: out std_logic;
-    out_pel_full: in std_logic;
-    out_pel: out std_logic_vector(13 downto 0);
-    out_pel_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(7 downto 0);
+    arg0_rd: out std_logic;
+    arg1_empty: in std_logic;
+    arg1: in std_logic_vector(7 downto 0);
+    arg1_rd: out std_logic;
+    arg2_empty: in std_logic;
+    arg2: in std_logic_vector(7 downto 0);
+    arg2_rd: out std_logic;
+    arg3_empty: in std_logic;
+    arg3: in std_logic_vector(7 downto 0);
+    arg3_rd: out std_logic;
+    arg4_empty: in std_logic;
+    arg4: in std_logic_vector(7 downto 0);
+    arg4_rd: out std_logic;
+    arg5_empty: in std_logic;
+    arg5: in std_logic_vector(7 downto 0);
+    arg5_rd: out std_logic;
+    arg6_empty: in std_logic;
+    arg6: in std_logic_vector(7 downto 0);
+    arg6_rd: out std_logic;
+    arg7_empty: in std_logic;
+    arg7: in std_logic_vector(7 downto 0);
+    arg7_rd: out std_logic;
+    arg8_empty: in std_logic;
+    arg8: in std_logic_vector(7 downto 0);
+    arg8_rd: out std_logic;
+    arg9_full: in std_logic;
+    arg9: out std_logic_vector(13 downto 0);
+    arg9_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -51,7 +51,7 @@ end sobel_y;
 
 architecture FSM of sobel_y is
 begin
-  comb: process(pel00, pel00_empty, pel01, pel01_empty, pel02, pel02_empty, pel10, pel10_empty, pel11, pel11_empty, pel12, pel12_empty, pel20, pel20_empty, pel21, pel21_empty, pel22, pel22_empty, out_pel_full)
+  comb: process(arg0, arg0_empty, arg1, arg1_empty, arg2, arg2_empty, arg3, arg3_empty, arg4, arg4_empty, arg5, arg5_empty, arg6, arg6_empty, arg7, arg7_empty, arg8, arg8_empty, arg9_full)
     variable p_p00 : unsigned(7 downto 0);
     variable p_p01 : unsigned(7 downto 0);
     variable p_p02 : unsigned(7 downto 0);
@@ -62,40 +62,40 @@ begin
     variable p_p21 : unsigned(7 downto 0);
     variable p_p22 : unsigned(7 downto 0);
   begin
-    -- pel22.rdy, pel21.rdy, pel20.rdy, pel12.rdy, pel11.rdy, pel10.rdy, pel02.rdy, pel01.rdy, pel00.rdy, out_pel.rdy / p_p22=pel22, p_p21=pel21, p_p20=pel20, p_p12=pel12, p_p11=pel11, p_p10=pel10, p_p02=pel02, p_p01=pel01, p_p00=pel00, wr(out_pel,(p_p00 : signed<14>)+(p_p01 : signed<14>)*2+(p_p02 : signed<14>)-(p_p20 : signed<14>)+2*(p_p21 : signed<14>)+(p_p22 : signed<14>))
-    if pel22_empty='0' and pel21_empty='0' and pel20_empty='0' and pel12_empty='0' and pel11_empty='0' and pel10_empty='0' and pel02_empty='0' and pel01_empty='0' and pel00_empty='0' and out_pel_full='0' then
-      p_p22 := from_std_logic_vector(pel22,8);
-      pel22_rd <= '1';
-      p_p21 := from_std_logic_vector(pel21,8);
-      pel21_rd <= '1';
-      p_p20 := from_std_logic_vector(pel20,8);
-      pel20_rd <= '1';
-      p_p12 := from_std_logic_vector(pel12,8);
-      pel12_rd <= '1';
-      p_p11 := from_std_logic_vector(pel11,8);
-      pel11_rd <= '1';
-      p_p10 := from_std_logic_vector(pel10,8);
-      pel10_rd <= '1';
-      p_p02 := from_std_logic_vector(pel02,8);
-      pel02_rd <= '1';
-      p_p01 := from_std_logic_vector(pel01,8);
-      pel01_rd <= '1';
-      p_p00 := from_std_logic_vector(pel00,8);
-      pel00_rd <= '1';
-      out_pel <= std_logic_vector((((conv_signed(p_p00,14)) + (mul(conv_signed(p_p01,14),to_signed(2,14)))) + (conv_signed(p_p02,14))) - (((conv_signed(p_p20,14)) + (mul(to_signed(2,14),conv_signed(p_p21,14)))) + (conv_signed(p_p22,14))));
-      out_pel_wr <= '1';
+    -- arg8.rdy, arg7.rdy, arg6.rdy, arg5.rdy, arg4.rdy, arg3.rdy, arg2.rdy, arg1.rdy, arg0.rdy, arg9.rdy / p_p22=arg8, p_p21=arg7, p_p20=arg6, p_p12=arg5, p_p11=arg4, p_p10=arg3, p_p02=arg2, p_p01=arg1, p_p00=arg0, wr(arg9,(p_p00 : signed<14>)+(p_p01 : signed<14>)*2+(p_p02 : signed<14>)-(p_p20 : signed<14>)+2*(p_p21 : signed<14>)+(p_p22 : signed<14>))
+    if arg8_empty='0' and arg7_empty='0' and arg6_empty='0' and arg5_empty='0' and arg4_empty='0' and arg3_empty='0' and arg2_empty='0' and arg1_empty='0' and arg0_empty='0' and arg9_full='0' then
+      p_p22 := from_std_logic_vector(arg8,8);
+      arg8_rd <= '1';
+      p_p21 := from_std_logic_vector(arg7,8);
+      arg7_rd <= '1';
+      p_p20 := from_std_logic_vector(arg6,8);
+      arg6_rd <= '1';
+      p_p12 := from_std_logic_vector(arg5,8);
+      arg5_rd <= '1';
+      p_p11 := from_std_logic_vector(arg4,8);
+      arg4_rd <= '1';
+      p_p10 := from_std_logic_vector(arg3,8);
+      arg3_rd <= '1';
+      p_p02 := from_std_logic_vector(arg2,8);
+      arg2_rd <= '1';
+      p_p01 := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
+      p_p00 := from_std_logic_vector(arg0,8);
+      arg0_rd <= '1';
+      arg9 <= std_logic_vector((((conv_signed(p_p00,14)) + (mul(conv_signed(p_p01,14),to_signed(2,14)))) + (conv_signed(p_p02,14))) - (((conv_signed(p_p20,14)) + (mul(to_signed(2,14),conv_signed(p_p21,14)))) + (conv_signed(p_p22,14))));
+      arg9_wr <= '1';
     else
-      pel00_rd <= '0';
-      pel01_rd <= '0';
-      pel02_rd <= '0';
-      pel10_rd <= '0';
-      pel11_rd <= '0';
-      pel12_rd <= '0';
-      pel20_rd <= '0';
-      pel21_rd <= '0';
-      pel22_rd <= '0';
-      out_pel_wr <= '0';
-      out_pel <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_rd <= '0';
+      arg2_rd <= '0';
+      arg3_rd <= '0';
+      arg4_rd <= '0';
+      arg5_rd <= '0';
+      arg6_rd <= '0';
+      arg7_rd <= '0';
+      arg8_rd <= '0';
+      arg9_wr <= '0';
+      arg9 <= (others => 'X');
     end if;
   end process;
   seq: process(clock, reset)

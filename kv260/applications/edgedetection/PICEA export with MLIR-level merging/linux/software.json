@@ -1,0 +1,11 @@
+{
+  "abi_version": 1,
+  "device": "/dev/mdc_accel0",
+  "compatible": "mdc,kv260-stream-v1",
+  "generation_stage": "linux_sources_emitted",
+  "deployment_verified": false,
+  "legacy_uniss_abi_compatible": false,
+  "buffer_bytes_per_channel": 65536,
+  "dma_mask_bits": 32,
+  "completion": "polling"
+}

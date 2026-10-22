@@ -14,18 +14,18 @@ use work.edgeDetectionOk_globals.all;
 
 entity line_buffer is
    port (
-    real_size_empty: in std_logic;
-    real_size: in std_logic_vector(5 downto 0);
-    real_size_rd: out std_logic;
-    ext_size_empty: in std_logic;
-    ext_size: in std_logic_vector(5 downto 0);
-    ext_size_rd: out std_logic;
-    in_pel_empty: in std_logic;
-    in_pel: in std_logic_vector(7 downto 0);
-    in_pel_rd: out std_logic;
-    out_pel_full: in std_logic;
-    out_pel: out std_logic_vector(7 downto 0);
-    out_pel_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(5 downto 0);
+    arg0_rd: out std_logic;
+    arg1_empty: in std_logic;
+    arg1: in std_logic_vector(5 downto 0);
+    arg1_rd: out std_logic;
+    arg2_empty: in std_logic;
+    arg2: in std_logic_vector(7 downto 0);
+    arg2_rd: out std_logic;
+    arg3_full: in std_logic;
+    arg3: out std_logic_vector(7 downto 0);
+    arg3_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -52,46 +52,46 @@ architecture FSM of line_buffer is
     signal n_line_buffer : array64_u8;
     signal en_line_buffer : array64_b;
 begin
-  comb: process(real_size, real_size_empty, ext_size, ext_size_empty, in_pel, in_pel_empty, out_pel_full, line_buffer, cnt_h, cnt_v, max_h, max_v, state)
+  comb: process(arg0, arg0_empty, arg1, arg1_empty, arg2, arg2_empty, arg3_full, line_buffer, cnt_h, cnt_v, max_h, max_v, state)
     variable p_pel : unsigned(7 downto 0);
     variable p_h : unsigned(5 downto 0);
     variable p_v : unsigned(5 downto 0);
     variable n_line_buffer_tmp : array64_u8;
     variable en_line_buffer_tmp : array64_b;
   begin
-    -- ext_size.rdy, real_size.rdy, state=IDLE / p_v=ext_size, p_h=real_size, state:=WORK, max_h:=p_h-1, max_v:=p_v
-    if ext_size_empty='0' and real_size_empty='0' and state=IDLE then
-      p_v := from_std_logic_vector(ext_size,6);
-      ext_size_rd <= '1';
-      p_h := from_std_logic_vector(real_size,6);
-      real_size_rd <= '1';
+    -- arg1.rdy, arg0.rdy, state=IDLE / p_v=arg1, p_h=arg0, state:=WORK, max_h:=p_h-1, max_v:=p_v
+    if arg1_empty='0' and arg0_empty='0' and state=IDLE then
+      p_v := from_std_logic_vector(arg1,6);
+      arg1_rd <= '1';
+      p_h := from_std_logic_vector(arg0,6);
+      arg0_rd <= '1';
       n_state <= WORK;
       en_state <= true;
       n_max_h <= (p_h) - (to_unsigned(1,6));
       en_max_h <= true;
       n_max_v <= p_v;
       en_max_v <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_pel_rd <= '0';
+      arg3 <= (others => 'X');
+      arg3_wr <= '0';
+      arg2_rd <= '0';
       n_cnt_v <= cnt_v;
       en_cnt_v <= false;
       n_cnt_h <= cnt_h;
       en_cnt_h <= false;
       n_line_buffer <= line_buffer;
       en_line_buffer <= (others => false);
-    -- in_pel.rdy, state=WORK, cnt_h < max_h && cnt_v < max_v, out_pel.rdy / p_pel=in_pel, state:=WORK, wr(out_pel,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=cnt_h+1
-    elsif in_pel_empty='0' and state=WORK and (((cnt_h) < (max_h)) AND ((cnt_v) < (max_v))) and out_pel_full='0' then
-      p_pel := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg2.rdy, state=WORK, cnt_h < max_h && cnt_v < max_v, arg3.rdy / p_pel=arg2, state:=WORK, wr(arg3,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=cnt_h+1
+    elsif arg2_empty='0' and state=WORK and (((cnt_h) < (max_h)) AND ((cnt_v) < (max_v))) and arg3_full='0' then
+      p_pel := from_std_logic_vector(arg2,8);
+      arg2_rd <= '1';
       n_state <= WORK;
       en_state <= true;
-      out_pel <= std_logic_vector(line_buffer(to_integer(cnt_h)));
-      out_pel_wr <= '1';
+      arg3 <= std_logic_vector(line_buffer(to_integer(cnt_h)));
+      arg3_wr <= '1';
       n_cnt_h <= (cnt_h) + (to_unsigned(1,6));
       en_cnt_h <= true;
-      real_size_rd <= '0';
-      ext_size_rd <= '0';
+      arg0_rd <= '0';
+      arg1_rd <= '0';
       n_max_v <= max_v;
       en_max_v <= false;
       n_max_h <= max_h;
@@ -104,20 +104,20 @@ begin
       en_line_buffer_tmp(to_integer(cnt_h)) := true;
       n_line_buffer <= n_line_buffer_tmp;
       en_line_buffer <= en_line_buffer_tmp;
-    -- in_pel.rdy, state=WORK, cnt_v < max_v, out_pel.rdy / p_pel=in_pel, state:=WORK, wr(out_pel,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=0, cnt_v:=cnt_v+1
-    elsif in_pel_empty='0' and state=WORK and ((cnt_v) < (max_v-1)) and out_pel_full='0' then
-      p_pel := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg2.rdy, state=WORK, cnt_v < max_v, arg3.rdy / p_pel=arg2, state:=WORK, wr(arg3,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=0, cnt_v:=cnt_v+1
+    elsif arg2_empty='0' and state=WORK and ((cnt_v) < (max_v-1)) and arg3_full='0' then
+      p_pel := from_std_logic_vector(arg2,8);
+      arg2_rd <= '1';
       n_state <= WORK;
       en_state <= true;
-      out_pel <= std_logic_vector(line_buffer(to_integer(cnt_h)));
-      out_pel_wr <= '1';
+      arg3 <= std_logic_vector(line_buffer(to_integer(cnt_h)));
+      arg3_wr <= '1';
       n_cnt_h <= to_unsigned(0,6);
       en_cnt_h <= true;
       n_cnt_v <= (cnt_v) + (to_unsigned(1,6));
       en_cnt_v <= true;
-      real_size_rd <= '0';
-      ext_size_rd <= '0';
+      arg0_rd <= '0';
+      arg1_rd <= '0';
       n_max_v <= max_v;
       en_max_v <= false;
       n_max_h <= max_h;
@@ -128,20 +128,20 @@ begin
       en_line_buffer_tmp(to_integer(cnt_h)) := true;
       n_line_buffer <= n_line_buffer_tmp;
       en_line_buffer <= en_line_buffer_tmp;
-    -- in_pel.rdy, state=WORK, out_pel.rdy / p_pel=in_pel, state:=IDLE, wr(out_pel,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=0, cnt_v:=0
-    elsif in_pel_empty='0' and state=WORK and out_pel_full='0' then
-      p_pel := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg2.rdy, state=WORK, arg3.rdy / p_pel=arg2, state:=IDLE, wr(arg3,line_buffer[cnt_h]), line_buffer[cnt_h]:=p_pel, cnt_h:=0, cnt_v:=0
+    elsif arg2_empty='0' and state=WORK and arg3_full='0' then
+      p_pel := from_std_logic_vector(arg2,8);
+      arg2_rd <= '1';
       n_state <= IDLE;
       en_state <= true;
-      out_pel <= std_logic_vector(line_buffer(to_integer(cnt_h)));
-      out_pel_wr <= '1';
+      arg3 <= std_logic_vector(line_buffer(to_integer(cnt_h)));
+      arg3_wr <= '1';
       n_cnt_h <= to_unsigned(0,6);
       en_cnt_h <= true;
       n_cnt_v <= to_unsigned(0,6);
       en_cnt_v <= true;
-      real_size_rd <= '0';
-      ext_size_rd <= '0';
+      arg0_rd <= '0';
+      arg1_rd <= '0';
       n_max_v <= max_v;
       en_max_v <= false;
       n_max_h <= max_h;
@@ -153,11 +153,11 @@ begin
       n_line_buffer <= n_line_buffer_tmp;
       en_line_buffer <= en_line_buffer_tmp;
     else
-      real_size_rd <= '0';
-      ext_size_rd <= '0';
-      in_pel_rd <= '0';
-      out_pel_wr <= '0';
-      out_pel <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_rd <= '0';
+      arg2_rd <= '0';
+      arg3_wr <= '0';
+      arg3 <= (others => 'X');
       en_state <= false;
       en_max_v <= false;
       en_max_h <= false;

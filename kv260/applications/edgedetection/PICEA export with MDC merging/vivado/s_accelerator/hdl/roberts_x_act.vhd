@@ -14,21 +14,21 @@ use work.edgeDetectionOk_globals.all;
 
 entity roberts_x is
    port (
-    pel00_empty: in std_logic;
-    pel00: in std_logic_vector(7 downto 0);
-    pel00_rd: out std_logic;
-    pel01_empty: in std_logic;
-    pel01: in std_logic_vector(7 downto 0);
-    pel01_rd: out std_logic;
-    pel10_empty: in std_logic;
-    pel10: in std_logic_vector(7 downto 0);
-    pel10_rd: out std_logic;
-    pel11_empty: in std_logic;
-    pel11: in std_logic_vector(7 downto 0);
-    pel11_rd: out std_logic;
-    out_pel_full: in std_logic;
-    out_pel: out std_logic_vector(13 downto 0);
-    out_pel_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(7 downto 0);
+    arg0_rd: out std_logic;
+    arg1_empty: in std_logic;
+    arg1: in std_logic_vector(7 downto 0);
+    arg1_rd: out std_logic;
+    arg2_empty: in std_logic;
+    arg2: in std_logic_vector(7 downto 0);
+    arg2_rd: out std_logic;
+    arg3_empty: in std_logic;
+    arg3: in std_logic_vector(7 downto 0);
+    arg3_rd: out std_logic;
+    arg4_full: in std_logic;
+    arg4: out std_logic_vector(13 downto 0);
+    arg4_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -36,31 +36,31 @@ end roberts_x;
 
 architecture FSM of roberts_x is
 begin
-  comb: process(pel00, pel00_empty, pel01, pel01_empty, pel10, pel10_empty, pel11, pel11_empty, out_pel_full)
+  comb: process(arg0, arg0_empty, arg1, arg1_empty, arg2, arg2_empty, arg3, arg3_empty, arg4_full)
     variable p_p00 : unsigned(7 downto 0);
     variable p_p01 : unsigned(7 downto 0);
     variable p_p10 : unsigned(7 downto 0);
     variable p_p11 : unsigned(7 downto 0);
   begin
-    -- pel11.rdy, pel10.rdy, pel01.rdy, pel00.rdy, out_pel.rdy / p_p11=pel11, p_p10=pel10, p_p01=pel01, p_p00=pel00, wr(out_pel,(p_p00 : signed<14>)-(p_p11 : signed<14>))
-    if pel11_empty='0' and pel10_empty='0' and pel01_empty='0' and pel00_empty='0' and out_pel_full='0' then
-      p_p11 := from_std_logic_vector(pel11,8);
-      pel11_rd <= '1';
-      p_p10 := from_std_logic_vector(pel10,8);
-      pel10_rd <= '1';
-      p_p01 := from_std_logic_vector(pel01,8);
-      pel01_rd <= '1';
-      p_p00 := from_std_logic_vector(pel00,8);
-      pel00_rd <= '1';
-      out_pel <= std_logic_vector((conv_signed(p_p00,14)) - (conv_signed(p_p11,14)));
-      out_pel_wr <= '1';
+    -- arg3.rdy, arg2.rdy, arg1.rdy, arg0.rdy, arg4.rdy / p_p11=arg3, p_p10=arg2, p_p01=arg1, p_p00=arg0, wr(arg4,(p_p00 : signed<14>)-(p_p11 : signed<14>))
+    if arg3_empty='0' and arg2_empty='0' and arg1_empty='0' and arg0_empty='0' and arg4_full='0' then
+      p_p11 := from_std_logic_vector(arg3,8);
+      arg3_rd <= '1';
+      p_p10 := from_std_logic_vector(arg2,8);
+      arg2_rd <= '1';
+      p_p01 := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
+      p_p00 := from_std_logic_vector(arg0,8);
+      arg0_rd <= '1';
+      arg4 <= std_logic_vector((conv_signed(p_p00,14)) - (conv_signed(p_p11,14)));
+      arg4_wr <= '1';
     else
-      pel00_rd <= '0';
-      pel01_rd <= '0';
-      pel10_rd <= '0';
-      pel11_rd <= '0';
-      out_pel_wr <= '0';
-      out_pel <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_rd <= '0';
+      arg2_rd <= '0';
+      arg3_rd <= '0';
+      arg4_wr <= '0';
+      arg4 <= (others => 'X');
     end if;
   end process;
   seq: process(clock, reset)

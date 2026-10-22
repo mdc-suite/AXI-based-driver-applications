@@ -1,0 +1,12 @@
+
+#####################Direct Connection##################
+## arg0
+PORT arg0_dout = "", DIR = I, VEC = [13:0]
+PORT arg0_empty_n = "", DIR = I
+PORT arg0_read = "", DIR = O
+## arg1
+PORT arg1_din = "", DIR = O, VEC = [7:0]
+PORT arg1_full_n = "", DIR = I
+PORT arg1_write = "", DIR = O
+########################################################
+

@@ -3,7 +3,7 @@
 //
 // Multi-Dataflow Composer tool - Platform Composer
 // Multi-Dataflow Test Bench module 
-// Date: 2026/09/18 19:41:37
+// Date: 2026/10/22 10:27:28
 //
 // Please note that the testbench manages only common signals to dataflows
 // - clock system signals
@@ -18,44 +18,44 @@ module tb_multi_dataflow;
 	// ----------------------------------------------------------------------------
 	parameter CLOCK_PERIOD = 10;
 	
-	parameter IN_PEL_ROBERTS_FILE = "in_pel_Roberts_file.mem";
-	parameter IN_PEL_ROBERTS_SIZE = 64;
-	parameter IN_PEL_SOBEL_FILE = "in_pel_Sobel_file.mem";
-	parameter IN_PEL_SOBEL_SIZE = 64;
-	parameter IN_SIZE_ROBERTS_FILE = "in_size_Roberts_file.mem";
-	parameter IN_SIZE_ROBERTS_SIZE = 64;
-	parameter IN_SIZE_SOBEL_FILE = "in_size_Sobel_file.mem";
-	parameter IN_SIZE_SOBEL_SIZE = 64;
+	parameter IN0_ROBERTS_FILE = "in0_Roberts_file.mem";
+	parameter IN0_ROBERTS_SIZE = 64;
+	parameter IN0_SOBEL_FILE = "in0_Sobel_file.mem";
+	parameter IN0_SOBEL_SIZE = 64;
+	parameter IN1_ROBERTS_FILE = "in1_Roberts_file.mem";
+	parameter IN1_ROBERTS_SIZE = 64;
+	parameter IN1_SOBEL_FILE = "in1_Sobel_file.mem";
+	parameter IN1_SOBEL_SIZE = 64;
 	
-	parameter OUT_PEL_ROBERTS_FILE = "out_pel_Roberts_file.mem";
-	parameter OUT_PEL_ROBERTS_SIZE = 64;
-	parameter OUT_PEL_SOBEL_FILE = "out_pel_Sobel_file.mem";
-	parameter OUT_PEL_SOBEL_SIZE = 64;
+	parameter OUT0_ROBERTS_FILE = "out0_Roberts_file.mem";
+	parameter OUT0_ROBERTS_SIZE = 64;
+	parameter OUT0_SOBEL_FILE = "out0_Sobel_file.mem";
+	parameter OUT0_SOBEL_SIZE = 64;
 	
 	// ----------------------------------------------------------------------------
 	
 	// multi_dataflow signals
 	// ----------------------------------------------------------------------------
 	reg start_feeding;
-	reg [7 : 0] in_pel_data;
-	reg in_pel_wr;
-	wire in_pel_full;
-	reg [7:0] in_pel_Roberts_file_data [IN_PEL_ROBERTS_SIZE-1:0];
-	reg [7:0] in_pel_Sobel_file_data [IN_PEL_SOBEL_SIZE-1:0];
-	integer in_pel_i = 0;
-	reg [5 : 0] in_size_data;
-	reg in_size_wr;
-	wire in_size_full;
-	reg [5:0] in_size_Roberts_file_data [IN_SIZE_ROBERTS_SIZE-1:0];
-	reg [5:0] in_size_Sobel_file_data [IN_SIZE_SOBEL_SIZE-1:0];
-	integer in_size_i = 0;
+	reg [5 : 0] in0_data;
+	reg in0_wr;
+	wire in0_full;
+	reg [5:0] in0_Roberts_file_data [IN0_ROBERTS_SIZE-1:0];
+	reg [5:0] in0_Sobel_file_data [IN0_SOBEL_SIZE-1:0];
+	integer in0_i = 0;
+	reg [7 : 0] in1_data;
+	reg in1_wr;
+	wire in1_full;
+	reg [7:0] in1_Roberts_file_data [IN1_ROBERTS_SIZE-1:0];
+	reg [7:0] in1_Sobel_file_data [IN1_SOBEL_SIZE-1:0];
+	integer in1_i = 0;
 	
-	wire [7 : 0] out_pel_data;
-	wire out_pel_wr;
-	reg out_pel_full;
-	reg [7:0] out_pel_Roberts_file_data [OUT_PEL_ROBERTS_SIZE-1:0];
-	reg [7:0] out_pel_Sobel_file_data [OUT_PEL_SOBEL_SIZE-1:0];
-	integer out_pel_i = 0;
+	wire [7 : 0] out0_data;
+	wire out0_wr;
+	reg out0_full;
+	reg [7:0] out0_Roberts_file_data [OUT0_ROBERTS_SIZE-1:0];
+	reg [7:0] out0_Sobel_file_data [OUT0_SOBEL_SIZE-1:0];
+	integer out0_i = 0;
 	
 	
 	reg [7:0] ID;
@@ -67,33 +67,33 @@ module tb_multi_dataflow;
 	// network input and output files
 	// ----------------------------------------------------------------------------
 	initial
-	 	$readmemh(IN_PEL_ROBERTS_FILE, in_pel_Roberts_file_data);
+	 	$readmemh(IN0_ROBERTS_FILE, in0_Roberts_file_data);
 	initial
-	 	$readmemh(IN_SIZE_ROBERTS_FILE, in_size_Roberts_file_data);
+	 	$readmemh(IN1_ROBERTS_FILE, in1_Roberts_file_data);
 	initial
-		$readmemh(OUT_PEL_ROBERTS_FILE, out_pel_Roberts_file_data);
+		$readmemh(OUT0_ROBERTS_FILE, out0_Roberts_file_data);
 	initial
-	 	$readmemh(IN_PEL_SOBEL_FILE, in_pel_Sobel_file_data);
+	 	$readmemh(IN0_SOBEL_FILE, in0_Sobel_file_data);
 	initial
-	 	$readmemh(IN_SIZE_SOBEL_FILE, in_size_Sobel_file_data);
+	 	$readmemh(IN1_SOBEL_FILE, in1_Sobel_file_data);
 	initial
-		$readmemh(OUT_PEL_SOBEL_FILE, out_pel_Sobel_file_data);
+		$readmemh(OUT0_SOBEL_FILE, out0_Sobel_file_data);
 	// ----------------------------------------------------------------------------
 
 	// dut
 	// ----------------------------------------------------------------------------
 	multi_dataflow dut (
-		.in_pel_data(in_pel_data),
-		.in_pel_wr(in_pel_wr),
-		.in_pel_full(in_pel_full),
+		.in0_data(in0_data),
+		.in0_wr(in0_wr),
+		.in0_full(in0_full),
 		
-		.in_size_data(in_size_data),
-		.in_size_wr(in_size_wr),
-		.in_size_full(in_size_full),
+		.in1_data(in1_data),
+		.in1_wr(in1_wr),
+		.in1_full(in1_full),
 		
-		.out_pel_data(out_pel_data),
-		.out_pel_wr(out_pel_wr),
-		.out_pel_full(out_pel_full),
+		.out0_data(out0_data),
+		.out0_wr(out0_wr),
+		.out0_full(out0_full),
 		
 		
 		.ID(ID),
@@ -124,11 +124,11 @@ module tb_multi_dataflow;
 			clock = 0;
 	
 		// network signals initialization
-				in_pel_data = 0;
-							in_pel_wr  = 1'b0;
-				in_size_data = 0;
-							in_size_wr  = 1'b0;
-				out_pel_full = 1'b0;
+				in0_data = 0;
+							in0_wr  = 1'b0;
+				in1_data = 0;
+							in1_wr  = 1'b0;
+				out0_full = 1'b0;
 	
 		// initial reset
 				reset = 1;
@@ -139,37 +139,37 @@ module tb_multi_dataflow;
 		#100
 	
 		// network inputs (output side)
-				out_pel_full = 1'b0;
+				out0_full = 1'b0;
 				
 		 		// executing Roberts
 		 		ID = 8'd1;
 	start_feeding = 1;
-	while(in_pel_i != IN_PEL_ROBERTS_SIZE)
+	while(in0_i != IN0_ROBERTS_SIZE)
 		#10;
-	while(in_size_i != IN_SIZE_ROBERTS_SIZE)
+	while(in1_i != IN1_ROBERTS_SIZE)
 		#10;
 	start_feeding = 0;
-	in_pel_data = 0;
-	in_pel_wr  = 1'b0;
-	in_pel_i = 0;
-	in_size_data = 0;
-	in_size_wr  = 1'b0;
-	in_size_i = 0;
+	in0_data = 0;
+	in0_wr  = 1'b0;
+	in0_i = 0;
+	in1_data = 0;
+	in1_wr  = 1'b0;
+	in1_i = 0;
 	#1000
 		 		// executing Sobel
 		 		ID = 8'd2;
 	start_feeding = 1;
-	while(in_pel_i != IN_PEL_SOBEL_SIZE)
+	while(in0_i != IN0_SOBEL_SIZE)
 		#10;
-	while(in_size_i != IN_SIZE_SOBEL_SIZE)
+	while(in1_i != IN1_SOBEL_SIZE)
 		#10;
 	start_feeding = 0;
-	in_pel_data = 0;
-	in_pel_wr  = 1'b0;
-	in_pel_i = 0;
-	in_size_data = 0;
-	in_size_wr  = 1'b0;
-	in_size_i = 0;
+	in0_data = 0;
+	in0_wr  = 1'b0;
+	in0_i = 0;
+	in1_data = 0;
+	in1_wr  = 1'b0;
+	in1_i = 0;
 	#1000
 	
 		$stop;
@@ -181,90 +181,90 @@ module tb_multi_dataflow;
 	always@(*)
 		if(start_feeding && ID == 1)
 	 			begin
-			while(in_pel_i < IN_PEL_ROBERTS_SIZE)
+			while(in0_i < IN0_ROBERTS_SIZE)
 			begin
 				#10
-			 			if(in_pel_full == 0)
+			 			if(in0_full == 0)
 			 			begin
-							in_pel_data = in_pel_Roberts_file_data[in_pel_i];
-							in_pel_wr  = 1'b1;
-					in_pel_i = in_pel_i + 1;
+							in0_data = in0_Roberts_file_data[in0_i];
+							in0_wr  = 1'b1;
+					in0_i = in0_i + 1;
 				end
 				else
 				begin
-							in_pel_data = 0;
-							in_pel_wr  = 1'b0;
+							in0_data = 0;
+							in0_wr  = 1'b0;
 				end
 			end
 			#10
-					in_pel_data = 0;
-					in_pel_wr  = 1'b0;
+					in0_data = 0;
+					in0_wr  = 1'b0;
 				end
 	always@(*)
 		if(start_feeding && ID == 1)
 	 			begin
-			while(in_size_i < IN_SIZE_ROBERTS_SIZE)
+			while(in1_i < IN1_ROBERTS_SIZE)
 			begin
 				#10
-			 			if(in_size_full == 0)
+			 			if(in1_full == 0)
 			 			begin
-							in_size_data = in_size_Roberts_file_data[in_size_i];
-							in_size_wr  = 1'b1;
-					in_size_i = in_size_i + 1;
+							in1_data = in1_Roberts_file_data[in1_i];
+							in1_wr  = 1'b1;
+					in1_i = in1_i + 1;
 				end
 				else
 				begin
-							in_size_data = 0;
-							in_size_wr  = 1'b0;
+							in1_data = 0;
+							in1_wr  = 1'b0;
 				end
 			end
 			#10
-					in_size_data = 0;
-					in_size_wr  = 1'b0;
+					in1_data = 0;
+					in1_wr  = 1'b0;
 				end
 	always@(*)
 		if(start_feeding && ID == 2)
 	 			begin
-			while(in_pel_i < IN_PEL_SOBEL_SIZE)
+			while(in0_i < IN0_SOBEL_SIZE)
 			begin
 				#10
-			 			if(in_pel_full == 0)
+			 			if(in0_full == 0)
 			 			begin
-							in_pel_data = in_pel_Sobel_file_data[in_pel_i];
-							in_pel_wr  = 1'b1;
-					in_pel_i = in_pel_i + 1;
+							in0_data = in0_Sobel_file_data[in0_i];
+							in0_wr  = 1'b1;
+					in0_i = in0_i + 1;
 				end
 				else
 				begin
-							in_pel_data = 0;
-							in_pel_wr  = 1'b0;
+							in0_data = 0;
+							in0_wr  = 1'b0;
 				end
 			end
 			#10
-					in_pel_data = 0;
-					in_pel_wr  = 1'b0;
+					in0_data = 0;
+					in0_wr  = 1'b0;
 				end
 	always@(*)
 		if(start_feeding && ID == 2)
 	 			begin
-			while(in_size_i < IN_SIZE_SOBEL_SIZE)
+			while(in1_i < IN1_SOBEL_SIZE)
 			begin
 				#10
-			 			if(in_size_full == 0)
+			 			if(in1_full == 0)
 			 			begin
-							in_size_data = in_size_Sobel_file_data[in_size_i];
-							in_size_wr  = 1'b1;
-					in_size_i = in_size_i + 1;
+							in1_data = in1_Sobel_file_data[in1_i];
+							in1_wr  = 1'b1;
+					in1_i = in1_i + 1;
 				end
 				else
 				begin
-							in_size_data = 0;
-							in_size_wr  = 1'b0;
+							in1_data = 0;
+							in1_wr  = 1'b0;
 				end
 			end
 			#10
-					in_size_data = 0;
-					in_size_wr  = 1'b0;
+					in1_data = 0;
+					in1_wr  = 1'b0;
 				end
 	// ----------------------------------------------------------------------------
 
@@ -273,26 +273,26 @@ module tb_multi_dataflow;
 	always@(posedge clock)
 				if(ID == 1)
 					begin
-					if(out_pel_wr == 1)
+					if(out0_wr == 1)
 						begin	
-						if(out_pel_data != out_pel_Roberts_file_data[out_pel_i])
-							$display("Error for config %d on output %d: obtained %d, expected %d", 1, out_pel_i, out_pel_data, out_pel_Roberts_file_data[out_pel_i]);
-						out_pel_i = out_pel_i + 1;
+						if(out0_data != out0_Roberts_file_data[out0_i])
+							$display("Error for config %d on output %d: obtained %d, expected %d", 1, out0_i, out0_data, out0_Roberts_file_data[out0_i]);
+						out0_i = out0_i + 1;
 						end
-									if(out_pel_i == OUT_PEL_ROBERTS_SIZE)
-						out_pel_i = 0;
+									if(out0_i == OUT0_ROBERTS_SIZE)
+						out0_i = 0;
 					end
 	always@(posedge clock)
 				if(ID == 2)
 					begin
-					if(out_pel_wr == 1)
+					if(out0_wr == 1)
 						begin	
-						if(out_pel_data != out_pel_Sobel_file_data[out_pel_i])
-							$display("Error for config %d on output %d: obtained %d, expected %d", 2, out_pel_i, out_pel_data, out_pel_Sobel_file_data[out_pel_i]);
-						out_pel_i = out_pel_i + 1;
+						if(out0_data != out0_Sobel_file_data[out0_i])
+							$display("Error for config %d on output %d: obtained %d, expected %d", 2, out0_i, out0_data, out0_Sobel_file_data[out0_i]);
+						out0_i = out0_i + 1;
 						end
-									if(out_pel_i == OUT_PEL_SOBEL_SIZE)
-						out_pel_i = 0;
+									if(out0_i == OUT0_SOBEL_SIZE)
+						out0_i = 0;
 					end
 	// ----------------------------------------------------------------------------
 

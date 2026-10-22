@@ -14,15 +14,15 @@ use work.edgeDetectionOk_globals.all;
 
 entity remove_3x3 is
    port (
-    in_size_empty: in std_logic;
-    in_size: in std_logic_vector(5 downto 0);
-    in_size_rd: out std_logic;
-    in_pel_empty: in std_logic;
-    in_pel: in std_logic_vector(7 downto 0);
-    in_pel_rd: out std_logic;
-    out_pel_full: in std_logic;
-    out_pel: out std_logic_vector(7 downto 0);
-    out_pel_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(5 downto 0);
+    arg0_rd: out std_logic;
+    arg1_empty: in std_logic;
+    arg1: in std_logic_vector(7 downto 0);
+    arg1_rd: out std_logic;
+    arg2_full: in std_logic;
+    arg2: out std_logic_vector(7 downto 0);
+    arg2_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -43,135 +43,135 @@ architecture FSM of remove_3x3 is
     signal n_cnt : unsigned(5 downto 0);
     signal en_cnt : boolean;
 begin
-  comb: process(in_size, in_size_empty, in_pel, in_pel_empty, out_pel_full, cnt, line, max, state)
+  comb: process(arg0, arg0_empty, arg1, arg1_empty, arg2_full, cnt, line, max, state)
     variable p_p : unsigned(7 downto 0);
     variable p_s : unsigned(5 downto 0);
   begin
-    -- in_size.rdy, state=IDLE / p_s=in_size, state:=DROP, max:=p_s-1
-    if in_size_empty='0' and state=IDLE then
-      p_s := from_std_logic_vector(in_size,6);
-      in_size_rd <= '1';
+    -- arg0.rdy, state=IDLE / p_s=arg0, state:=DROP, max:=p_s-1
+    if arg0_empty='0' and state=IDLE then
+      p_s := from_std_logic_vector(arg0,6);
+      arg0_rd <= '1';
       n_state <= DROP;
       en_state <= true;
       n_max <= (p_s) - (to_unsigned(1,6));
       en_max <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_pel_rd <= '0';
+      arg2 <= (others => 'X');
+      arg2_wr <= '0';
+      arg1_rd <= '0';
       n_line <= line;
       en_line <= false;
       n_cnt <= cnt;
       en_cnt <= false;
-    -- in_pel.rdy, state=DROP, cnt < max && line < 2 / p_p=in_pel, state:=DROP, cnt:=cnt+1
-    elsif in_pel_empty='0' and state=DROP and (((cnt) < (max)) AND ((line) < (to_unsigned(2,6)))) then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=DROP, cnt < max && line < 2 / p_p=arg1, state:=DROP, cnt:=cnt+1
+    elsif arg1_empty='0' and state=DROP and (((cnt) < (max)) AND ((line) < (to_unsigned(2,6)))) then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= DROP;
       en_state <= true;
       n_cnt <= (cnt) + (to_unsigned(1,6));
       en_cnt <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_size_rd <= '0';
+      arg2 <= (others => 'X');
+      arg2_wr <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
       n_line <= line;
       en_line <= false;
-    -- in_pel.rdy, state=DROP, line < 2 / p_p=in_pel, state:=DROP, cnt:=0, line:=line+1
-    elsif in_pel_empty='0' and state=DROP and ((line) < (to_unsigned(2,6))) then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=DROP, line < 2 / p_p=arg1, state:=DROP, cnt:=0, line:=line+1
+    elsif arg1_empty='0' and state=DROP and ((line) < (to_unsigned(2,6))) then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= DROP;
       en_state <= true;
       n_cnt <= to_unsigned(0,6);
       en_cnt <= true;
       n_line <= (line) + (to_unsigned(1,6));
       en_line <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_size_rd <= '0';
+      arg2 <= (others => 'X');
+      arg2_wr <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
-    -- in_pel.rdy, state=DROP / p_p=in_pel, state:=WORK, cnt:=cnt+1
-    elsif in_pel_empty='0' and state=DROP then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=DROP / p_p=arg1, state:=WORK, cnt:=cnt+1
+    elsif arg1_empty='0' and state=DROP then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= WORK;
       en_state <= true;
       n_cnt <= (cnt) + (to_unsigned(1,6));
       en_cnt <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_size_rd <= '0';
+      arg2 <= (others => 'X');
+      arg2_wr <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
       n_line <= line;
       en_line <= false;
-    -- in_pel.rdy, state=WORK, cnt < 2 && line < max + 1 / p_p=in_pel, state:=WORK, cnt:=cnt+1
-    elsif in_pel_empty='0' and state=WORK and (((cnt) < (to_unsigned(2,6))) AND ((line) < ((max) + (to_unsigned(1,6))))) then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=WORK, cnt < 2 && line < max + 1 / p_p=arg1, state:=WORK, cnt:=cnt+1
+    elsif arg1_empty='0' and state=WORK and (((cnt) < (to_unsigned(2,6))) AND ((line) < ((max) + (to_unsigned(1,6))))) then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= WORK;
       en_state <= true;
       n_cnt <= (cnt) + (to_unsigned(1,6));
       en_cnt <= true;
-      out_pel <= (others => 'X');
-      out_pel_wr <= '0';
-      in_size_rd <= '0';
+      arg2 <= (others => 'X');
+      arg2_wr <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
       n_line <= line;
       en_line <= false;
-    -- in_pel.rdy, state=WORK, cnt < max && line < max + 1, out_pel.rdy / p_p=in_pel, state:=WORK, wr(out_pel,p_p), cnt:=cnt+1
-    elsif in_pel_empty='0' and state=WORK and (((cnt) < (max)) AND ((line) < ((max) + (to_unsigned(1,6))))) and out_pel_full='0' then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=WORK, cnt < max && line < max + 1, arg2.rdy / p_p=arg1, state:=WORK, wr(arg2,p_p), cnt:=cnt+1
+    elsif arg1_empty='0' and state=WORK and (((cnt) < (max)) AND ((line) < ((max) + (to_unsigned(1,6))))) and arg2_full='0' then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= WORK;
       en_state <= true;
-      out_pel <= std_logic_vector(p_p);
-      out_pel_wr <= '1';
+      arg2 <= std_logic_vector(p_p);
+      arg2_wr <= '1';
       n_cnt <= (cnt) + (to_unsigned(1,6));
       en_cnt <= true;
-      in_size_rd <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
       n_line <= line;
       en_line <= false;
-    -- in_pel.rdy, state=WORK, line < max, out_pel.rdy / p_p=in_pel, state:=WORK, wr(out_pel,p_p), cnt:=0, line:=line+1
-    elsif in_pel_empty='0' and state=WORK and ((line) < (max)) and out_pel_full='0' then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=WORK, line < max, arg2.rdy / p_p=arg1, state:=WORK, wr(arg2,p_p), cnt:=0, line:=line+1
+    elsif arg1_empty='0' and state=WORK and ((line) < (max)) and arg2_full='0' then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= WORK;
       en_state <= true;
-      out_pel <= std_logic_vector(p_p);
-      out_pel_wr <= '1';
+      arg2 <= std_logic_vector(p_p);
+      arg2_wr <= '1';
       n_cnt <= to_unsigned(0,6);
       en_cnt <= true;
       n_line <= (line) + (to_unsigned(1,6));
       en_line <= true;
-      in_size_rd <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
-    -- in_pel.rdy, state=WORK, out_pel.rdy / p_p=in_pel, state:=IDLE, wr(out_pel,p_p), cnt:=0, line:=0
-    elsif in_pel_empty='0' and state=WORK and out_pel_full='0' then
-      p_p := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
+    -- arg1.rdy, state=WORK, arg2.rdy / p_p=arg1, state:=IDLE, wr(arg2,p_p), cnt:=0, line:=0
+    elsif arg1_empty='0' and state=WORK and arg2_full='0' then
+      p_p := from_std_logic_vector(arg1,8);
+      arg1_rd <= '1';
       n_state <= IDLE;
       en_state <= true;
-      out_pel <= std_logic_vector(p_p);
-      out_pel_wr <= '1';
+      arg2 <= std_logic_vector(p_p);
+      arg2_wr <= '1';
       n_cnt <= to_unsigned(0,6);
       en_cnt <= true;
       n_line <= to_unsigned(0,6);
       en_line <= true;
-      in_size_rd <= '0';
+      arg0_rd <= '0';
       n_max <= max;
       en_max <= false;
     else
-      in_size_rd <= '0';
-      in_pel_rd <= '0';
-      out_pel_wr <= '0';
-      out_pel <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_rd <= '0';
+      arg2_wr <= '0';
+      arg2 <= (others => 'X');
       en_state <= false;
       en_max <= false;
       en_line <= false;

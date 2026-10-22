@@ -5,9 +5,9 @@ This folder contains the Kria KV260 bitstream and test data for the Roberts–So
 | File | Description |
 | --- | --- |
 | `design_1_wrapper.bit` | FPGA bitstream. |
-| `in0_file.mem` | Input image tokens for `in0`. |
-| `in1_file.mem` | Image-size parameter for `in1`. |
-| `out0_Roberts_file.mem` | Roberts reference output for `out0`. |
-| `out0_Sobel_file.mem` | Sobel reference output for `out0`. |
+| `in_size_file.mem` | Image-size parameter for `in0`. |
+| `in_pel_file.mem` | Input image tokens for `in1`. |
+| `out_pel_Roberts_file.mem` | Roberts reference output for `out0`. |
+| `out_pel_Sobel_file.mem` | Sobel reference output for `out0`. |
 
-Use the exact mode names **`Robrts`** and **`Sobel`**. See the [main README](../README.md) for deployment and testing commands.
+Use the exact mode names **`Robrets`** and **`Sobel`**. See the [main README](../README.md) for deployment and testing commands.

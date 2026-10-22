@@ -10,4 +10,4 @@ This folder contains the Kria KV260 bitstream and test data for the Roberts–So
 | `out_pel_Roberts_file.mem` | Roberts reference output for `out_pel`. |
 | `out_pel_Sobel_file.mem` | Sobel reference output for `out_pel`. |
 
-Use the exact mode names **`Robrts`** and **`Sobel`**. See the [main README](../README.md) for deployment and testing commands.
+Use the exact mode names **`Roberts`** and **`Sobel`**. See the [main README](../README.md) for deployment and testing commands.

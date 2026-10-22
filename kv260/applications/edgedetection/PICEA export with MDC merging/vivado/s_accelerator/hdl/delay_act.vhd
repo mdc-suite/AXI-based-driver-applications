@@ -14,12 +14,12 @@ use work.edgeDetectionOk_globals.all;
 
 entity delay is
    port (
-    in_pel_empty: in std_logic;
-    in_pel: in std_logic_vector(7 downto 0);
-    in_pel_rd: out std_logic;
-    out_pel_full: in std_logic;
-    out_pel: out std_logic_vector(7 downto 0);
-    out_pel_wr: out std_logic;
+    arg0_empty: in std_logic;
+    arg0: in std_logic_vector(7 downto 0);
+    arg0_rd: out std_logic;
+    arg1_full: in std_logic;
+    arg1: out std_logic_vector(7 downto 0);
+    arg1_wr: out std_logic;
     clock: in std_logic;
     reset: in std_logic
     );
@@ -30,21 +30,21 @@ architecture FSM of delay is
     signal n_data : unsigned(7 downto 0);
     signal en_data : boolean;
 begin
-  comb: process(in_pel, in_pel_empty, out_pel_full, data)
+  comb: process(arg0, arg0_empty, arg1_full, data)
     variable p_pel : unsigned(7 downto 0);
   begin
-    -- in_pel.rdy, out_pel.rdy / p_pel=in_pel, wr(out_pel,data), data:=p_pel
-    if in_pel_empty='0' and out_pel_full='0' then
-      p_pel := from_std_logic_vector(in_pel,8);
-      in_pel_rd <= '1';
-      out_pel <= std_logic_vector(data);
-      out_pel_wr <= '1';
+    -- arg0.rdy, arg1.rdy / p_pel=arg0, wr(arg1,data), data:=p_pel
+    if arg0_empty='0' and arg1_full='0' then
+      p_pel := from_std_logic_vector(arg0,8);
+      arg0_rd <= '1';
+      arg1 <= std_logic_vector(data);
+      arg1_wr <= '1';
       n_data <= p_pel;
       en_data <= true;
     else
-      in_pel_rd <= '0';
-      out_pel_wr <= '0';
-      out_pel <= (others => 'X');
+      arg0_rd <= '0';
+      arg1_wr <= '0';
+      arg1 <= (others => 'X');
       en_data <= false;
       n_data <= data;
     end if;

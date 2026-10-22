@@ -1,7 +1,7 @@
 /*****************************************************************************
 *  Filename:          s_accelerator.h
 *  Description:       Stream Accelerator Driver Header
-*  Date:              2026/09/18 19:41:37 (by Multi-Dataflow Composer - Platform Composer)
+*  Date:              2026/10/22 10:27:28 (by Multi-Dataflow Composer - Platform Composer)
 *****************************************************************************/
 
 #ifndef S_ACCELERATOR_H
@@ -15,21 +15,21 @@
 
 
 int s_accelerator_Roberts(
-	// port out_pel
-	int size_out_pel, int* data_out_pel,
-	// port in_size
-	int size_in_size, int* data_in_size,
-	// port in_pel
-	int size_in_pel, int* data_in_pel
+	// port out0
+	int size_out0, int* data_out0,
+	// port in1
+	int size_in1, int* data_in1,
+	// port in0
+	int size_in0, int* data_in0
 );
 
 int s_accelerator_Sobel(
-	// port out_pel
-	int size_out_pel, int* data_out_pel,
-	// port in_size
-	int size_in_size, int* data_in_size,
-	// port in_pel
-	int size_in_pel, int* data_in_pel
+	// port out0
+	int size_out0, int* data_out0,
+	// port in1
+	int size_in1, int* data_in1,
+	// port in0
+	int size_in0, int* data_in0
 );
 
 

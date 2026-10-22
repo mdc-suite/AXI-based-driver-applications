@@ -42,7 +42,7 @@ The board definition must be installed in Vivado. Check the supplied Vivado conf
 | --- | --- |
 | [`MLIR/`](MLIR/) | `roberts.mlir`, `sobel.mlir`, `robertspass.mlir`, `sobelpass.mlir`, and export instructions. |
 | [`MDC/`](MDC/) | Input networks and CAL actor interfaces for MDC. |
-| [`MDC/baseline/`](MDC/baseline/) | `Robrts.xdf`, `Sobel.xdf`, and their `.xdfdiag` visualization files. |
+| [`MDC/baseline/`](MDC/baseline/) | `Robrets.xdf`, `Sobel.xdf`, and their `.xdfdiag` visualization files. |
 | [`MDC/custom/`](MDC/custom/) | CAL interfaces for line buffering, delay, gradient computation, border removal, absolute sum, and thresholding. |
 | [`vivado/`](vivado/) | Generated hardware and Vivado automation scripts. |
 | [`vivado/accelerator.json`](vivado/accelerator.json) | Generated accelerator description accompanying the hardware build. |
@@ -57,7 +57,7 @@ Detailed instructions are available in [`MLIR/Readme.md`](MLIR/Readme.md), [`MDC
 
 ### MDC inputs
 
-Follow [`MLIR/Readme.md`](MLIR/Readme.md) to regenerate the PICEA exports. `MDC/baseline/` contains the two networks to merge in MDC: `Robrts.xdf` and `Sobel.xdf`. `MDC/custom/` contains their CAL interfaces:
+Follow [`MLIR/Readme.md`](MLIR/Readme.md) to regenerate the PICEA exports. `MDC/baseline/` contains the two networks to merge in MDC: `Roberts.xdf` and `Sobel.xdf`. `MDC/custom/` contains their CAL interfaces:
 
 ```text
 abs_sum.cal       delay.cal         line_buffer.cal
@@ -165,10 +165,10 @@ The `Test files/` directory contains:
 | File | Purpose |
 | --- | --- |
 | `design_1_wrapper.bit` | Supplied Vivado bitstream for the accelerator. |
-| `in0_file.mem` | Input image tokens shared by both tests. |
-| `in1_file.mem` | Input image-size parameter. |
-| `out0_Roberts_file.mem` | Expected Roberts output. |
-| `out0_Sobel_file.mem` | Expected Sobel output. |
+| `in_pel_file.mem` | Input image tokens shared by both tests. |
+| `in_size_file.mem` | Input image-size parameter. |
+| `out_pel_Roberts_file.mem` | Expected Roberts output. |
+| `out_pel_Sobel_file.mem` | Expected Sobel output. |
 
 Use the supplied bitstream with its matching overlay and generated software configuration. This deployment loads `design_1_wrapper.bit` directly with `fpgautil`; no `.bin` conversion is required for this setup.
 
@@ -180,21 +180,21 @@ See [`linux/TESTING.md`](linux/TESTING.md) for the exact data format and command
 
 ```bash
 sudo ./linux/userspace/mdc_test \
-  --mode Robrts \
-  --input "in1=in1_file.mem" \
-  --input "in0=in0_file.mem" \
-  --output out0=out0_Roberts_actual.mem \
-  --expect "out0=out0_Roberts_file.mem"
+  --mode Roberts \
+  --input "in0=in_size_file.mem" \
+  --input "in1=in_pel_file.mem" \
+  --output out0=out_pel_Roberts_actual.mem \
+  --expect "out0=out_pel_Roberts_file.mem"
 
 sudo ./linux/userspace/mdc_test \
   --mode Sobel \
-  --input "in1=Test files/in1_file.mem" \
-  --input "in0=in0_file.mem" \
-  --output out0=out0_Sobel_actual.mem \
-  --expect "out0=out0_Sobel_file.mem"
+  --input "in0=in_size_file.mem" \
+  --input "in1=in_pel_file.mem" \
+  --output out0=out_pel_Sobel_actual.mem \
+  --expect "out0=out_pel_Sobel_file.mem"
 ```
 
-**The port names are `in0`, `in1`, and `out0`.** `in0` carries the image stream, `in1` carries the size parameter, and `out0` carries the result. The generated mode name is **`Robrts`**, matching `Robrts.xdf`; the reference filename retains the spelling `Roberts`.
+**The port names are `in0`, `in1`, and `out0`.** `in0` carries the size parameter, `in1` carries the image stream, and `out0` carries the result.
 
 Inspect the generated configuration with:
 
@@ -206,13 +206,13 @@ The supplied configuration reports `/dev/mdc_accel0`, a 65,536-byte buffer, thre
 
 | Port | Channel | Direction | Token width |
 | --- | ---: | --- | ---: |
-| `in0` | 0 | Input | 8 bits |
-| `in1` | 1 | Input | 6 bits |
+| `in0` | 0 | Input | 6 bits |
+| `in1` | 1 | Input | 8 bits |
 | `out0` | 2 | Output | 8 bits |
 
 | Mode | ID | Active ports |
 | --- | ---: | --- |
-| `Robrts` | 1 | `in0`, `in1`, `out0` |
+| `Robrets` | 1 | `in0`, `in1`, `out0` |
 | `Sobel` | 2 | `in0`, `in1`, `out0` |
 
 The `.mem` files contain tokens in the format supported by the test utility; they are not PGM, PNG, or JPEG images. Both modes can use the same source image, but each requires its own reference output.

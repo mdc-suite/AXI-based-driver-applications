@@ -1,15 +1,15 @@
-<?xml version="1.0" encoding="UTF-8"?><XDF name="top">
+<?xml version="1.0" encoding="UTF-8"?><XDF name="Sobel">
   <Port kind="Input" name="in0">
     <Type name="int">
       <Entry kind="Expr" name="size">
-        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+        <Expr kind="Literal" literal-kind="Integer" value="6"/>
       </Entry>
     </Type>
   </Port>
   <Port kind="Input" name="in1">
     <Type name="int">
       <Entry kind="Expr" name="size">
-        <Expr kind="Literal" literal-kind="Integer" value="6"/>
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
       </Entry>
     </Type>
   </Port>
@@ -72,17 +72,17 @@
     <Class name="custom.remove_3x3"/>
     <Attribute kind="Flag" name="count"/>
   </Instance>
-  <Connection dst="line_buffer_0" dst-port="arg0" src="" src-port="in1"/>
-  <Connection dst="line_buffer_0" dst-port="arg1" src="" src-port="in1"/>
-  <Connection dst="line_buffer_0" dst-port="arg2" src="" src-port="in0"/>
-  <Connection dst="line_buffer_1" dst-port="arg0" src="" src-port="in1"/>
-  <Connection dst="line_buffer_1" dst-port="arg1" src="" src-port="in1"/>
+  <Connection dst="line_buffer_0" dst-port="arg0" src="" src-port="in0"/>
+  <Connection dst="line_buffer_0" dst-port="arg1" src="" src-port="in0"/>
+  <Connection dst="line_buffer_0" dst-port="arg2" src="" src-port="in1"/>
+  <Connection dst="line_buffer_1" dst-port="arg0" src="" src-port="in0"/>
+  <Connection dst="line_buffer_1" dst-port="arg1" src="" src-port="in0"/>
   <Connection dst="line_buffer_1" dst-port="arg2" src="line_buffer_0" src-port="arg3"/>
   <Connection dst="delay_2" dst-port="arg0" src="line_buffer_1" src-port="arg3"/>
   <Connection dst="delay_3" dst-port="arg0" src="delay_2" src-port="arg1"/>
   <Connection dst="delay_4" dst-port="arg0" src="line_buffer_0" src-port="arg3"/>
   <Connection dst="delay_5" dst-port="arg0" src="delay_4" src-port="arg1"/>
-  <Connection dst="delay_6" dst-port="arg0" src="" src-port="in0"/>
+  <Connection dst="delay_6" dst-port="arg0" src="" src-port="in1"/>
   <Connection dst="delay_7" dst-port="arg0" src="delay_6" src-port="arg1"/>
   <Connection dst="sobel_x_8" dst-port="arg0" src="delay_3" src-port="arg1"/>
   <Connection dst="sobel_x_8" dst-port="arg1" src="delay_2" src-port="arg1"/>
@@ -92,7 +92,7 @@
   <Connection dst="sobel_x_8" dst-port="arg5" src="line_buffer_0" src-port="arg3"/>
   <Connection dst="sobel_x_8" dst-port="arg6" src="delay_7" src-port="arg1"/>
   <Connection dst="sobel_x_8" dst-port="arg7" src="delay_6" src-port="arg1"/>
-  <Connection dst="sobel_x_8" dst-port="arg8" src="" src-port="in0"/>
+  <Connection dst="sobel_x_8" dst-port="arg8" src="" src-port="in1"/>
   <Connection dst="sobel_y_9" dst-port="arg0" src="delay_3" src-port="arg1"/>
   <Connection dst="sobel_y_9" dst-port="arg1" src="delay_2" src-port="arg1"/>
   <Connection dst="sobel_y_9" dst-port="arg2" src="line_buffer_1" src-port="arg3"/>
@@ -101,11 +101,11 @@
   <Connection dst="sobel_y_9" dst-port="arg5" src="line_buffer_0" src-port="arg3"/>
   <Connection dst="sobel_y_9" dst-port="arg6" src="delay_7" src-port="arg1"/>
   <Connection dst="sobel_y_9" dst-port="arg7" src="delay_6" src-port="arg1"/>
-  <Connection dst="sobel_y_9" dst-port="arg8" src="" src-port="in0"/>
+  <Connection dst="sobel_y_9" dst-port="arg8" src="" src-port="in1"/>
   <Connection dst="abs_sum_10" dst-port="arg0" src="sobel_x_8" src-port="arg9"/>
   <Connection dst="abs_sum_10" dst-port="arg1" src="sobel_y_9" src-port="arg9"/>
   <Connection dst="thr_11" dst-port="arg0" src="abs_sum_10" src-port="arg2"/>
-  <Connection dst="remove_3x3_12" dst-port="arg0" src="" src-port="in1"/>
+  <Connection dst="remove_3x3_12" dst-port="arg0" src="" src-port="in0"/>
   <Connection dst="remove_3x3_12" dst-port="arg1" src="thr_11" src-port="arg1"/>
   <Connection dst="" dst-port="out0" src="remove_3x3_12" src-port="arg2"/>
 </XDF>

@@ -1,81 +1,101 @@
-# Examples
+# Roberts–Sobel Export from PICEA for Merging in MDC
 
-## Prerequisites
+This example exports separate Roberts and Sobel dataflow networks from MLIR using PICEA. **MDC performs the network merging.** The default implementation uses the existing CAPH actor HDL library. Actor HDL generated through EmitHLS and Vitis HLS can optionally be evaluated with the same example.
 
-To enable neural network functionality, additional utilities must be installed.
-In addition, to use this Python utility, a dedicated LLVM build is required.
-The LLVM version must match the one used to build IREE, and it must include the custom extensions, which are provided in the [llvm-iree](https://gitlab.abinsula.com/myrtus/dpe/step3/llvm-iree) repository.
-The same CMake flags can be used to build this llvm-iree, as described in [build_dfg.sh](../build_dfg.sh).
+RESIN is the command-line entry point of the PICEA compiler. The PICEA passes perform preparation and export.
 
-## **Conversion and Translation for the MDC Backend**
+## Files in this folder
 
-To generate a valid MDC project from MLIR, we provide a conversion pass pipeline: `--convert-to-mdc`. This pipeline transforms the input MLIR code into a set of files and directories compatible with the **Orcc Environment**. All generated files are organized within an `MDC/` directory, which includes the subdirectories `bin/`, `references/`, and `src/`.
+| File | Purpose |
+| --- | --- |
+| `robertssobel.mlir` | Source containing the actor definitions and separate `@Roberts` and `@Sobel` regions. Use this file to regenerate the MDC inputs. |
+| `mdc.mlir` | Supplied prepared snapshot containing a single merged `@top` region, configuration metadata, and S-boxes. It belongs to the PICEA-merging path and must not be used as the separate-network input for this flow. |
+| `actors.emithls.mlir` | Supplied EmitHLS actor representation for inspecting the optional actor-generation path. Regenerate actor-synthesis inputs from the source when testing a new build. |
 
-For each MLIR file, the pipeline produces:
+**Do not enable `--merging` in the commands below.** Regenerate into a separate output directory to avoid confusing the new unmerged representation with the supplied merged `mdc.mlir` snapshot.
 
-* **An XDF network** representing the dataflow graph.
-* **Multiple CAL actor files**, each corresponding to a function or subroutine in the MLIR.
-* **Two subdirectories under `src/`**:
+## Requirements
 
-  * `baseline/`: contains the `.xdf` file (network definition) and `.xdfdiag` (graphical metadata).
-  * `custom/`: contains the generated CAL actor files for each function/operator.
+Use a PICEA build providing `resin`, `picea-opt`, and `picea-translate`, together with MDC and the matching CAPH actor library and protocol description. Vivado is required for FPGA implementation. Vitis HLS is required only for the optional EmitHLS actor-synthesis path.
 
-The MLIR dialects supported by this pipeline include `arith`, `index`, `math`, `scf`, and `dfg`. Their operations are translated into equivalent CAL actors.
+The commands below assume the PICEA executables are available on `PATH` and that the current directory contains `robertssobel.mlir`. Otherwise, use the absolute paths to the executables in your PICEA build directory.
 
----
+## 1. Export with RESIN
 
-### **Usage Instructions**
+For the default CAPH-based implementation:
 
-Assuming your MLIR input file is named `roberts.mlir`, follow the steps below to generate and inspect the MDC project:
-
-1. **Generate MDC files**
-
-   ```bash
-   dfg-opt roberts.mlir --prepare-for-mdc | dfg-translate --dfg-to-mdc --output-dir=/path/to/output
-   ```
-
-2. **Inspect the generated files**
-   Navigate to the output directory:
-
-   ```bash
-   cd /path/to/output/MDC/
-   ```
-
-3. **Open the project in Orcc**
-   Copy the entire `MDC/` folder into an Orcc project directory. You can then use the Orcc IDE to:
-
-   * Visualize the graphical network (via `.xdf` and `.xdfdiag` files).
-   * Inspect and simulate the generated CAL actors.
-
----
-
-### **Example: Shorted Roberts Filter**
-
-The following code snippet defines two simple SDF operators, `@line_buffer` and `@delay`, each of which performs basic arithmetic operations and emits an output. They are instantiated and interconnected in the top-level region.
-
-```mlir
-dfg.operator @line_buffer inputs(%real_size: i6,%ext_size: i6, %in_pel: i8) outputs(%out_pel: i8) {      
-    %0 = arith.addi %real_size,%ext_size : i6
-    %2 = arith.extui %0 : i6 to i8
-    %1 = arith.addi %in_pel, %2 : i8      
-    dfg.output %1: i8
-}
-dfg.operator @delay inputs(%in_pel: i8) outputs(%out_pel: i8) {
-    %0 = arith.constant 0 : i8
-    %1 = arith.addi %in_pel, %0 : i8  
-    dfg.output %1: i8  
-}
-
-dfg.region @top inputs (%in_size:i6, %in_pel: i8) outputs(%out_pel: i8) {
-	%0:2 = dfg.channel(1) : i8
-    dfg.instantiate @line_buffer inputs(%in_size,%in_size,%in_pel) outputs(%0#0) : (i6,i6,i8) -> i8
-    dfg.instantiate @delay inputs(%0#1) outputs(%out_pel) : (i8) -> i8
-}
+```bash
+resin robertssobel.mlir --mdc --mdc-actors --mdc --hls-target-device=xck26-sfvc784-2LV-c -o build-mdc
 ```
-This structure enables a **modular and composable design** and can be **automatically translated into XDF networks and CAL actors** for deployment within the Orcc toolchain. The generated files include `roberts.xdf` and `roberts.xdfdiag` (stored in the `baseline/` directory and always named consistently), as well as `line_buffer.cal` and `delay.cal` (stored in the `custom/` directory, named after the operators defined in the MLIR).
+This invokes PICEA network preparation and MDC export. The generated project is placed under `build-mdc/MDC/`, with network descriptions under `src/baseline/` and CAL actor interfaces under `src/custom/`. The prepared DFG is written to `build-mdc/mdc.mlir`.
 
-In the Orcc environment, you can import:
+## 2. Alternative: prepare and translate separately
 
-* [HDL components Libraries](https://github.com/mcheshfar/AXI-based-driver-applications/tree/main/kv260/applications/edgedetection/MDC_MLIR/vivado/src_hdl),
-* [MDC files](https://github.com/mcheshfar/AXI-based-driver-applications/tree/main/kv260/applications/edgedetection/MDC_MLIR/MDC),
-* and the [Vivado protocol file](https://github.com/mcheshfar/AXI-based-driver-applications/tree/main/kv260/applications/edgedetection/protocols).
+The following commands invoke the preparation and export stages individually. **Merging remains in MDC**, since `--merging` is omitted.
+
+First, prepare the DFG and export the XDF networks and CAL actor interfaces:
+
+```bash
+mkdir -p build-manual
+
+picea-opt robertssobel.mlir \
+  --prepare-for-mdc \
+  -o robertssobel.mdc.mlir
+
+picea-translate robertssobel.mdc.mlir \
+  --dfg-to-mdc \
+  --mdc-output-dir=build-manual
+```
+
+**For the CAPH-based implementation, these commands are sufficient.** Supply the exported networks and interfaces to MDC together with the matching CAPH HDL library and protocol description.
+
+To optionally generate HLS actor implementations, lower the prepared DFG to EmitHLS and export the C++ source and Vitis HLS synthesis script:
+
+```bash
+picea-opt robertssobel.mdc.mlir \
+  --convert-to-emithls --for-mdc \
+  -o robertssobel.emithls.mdc.mlir
+
+picea-translate robertssobel.emithls.mdc.mlir \
+  --emithls-to-cpp \
+  -o build-manual/main.cpp
+
+picea-translate robertssobel.emithls.mdc.mlir \
+  --emithls-to-hls-tcl \
+  --hls-actor-library \
+  --hls-source-file=main.cpp \
+  --hls-target-device=xck26-sfvc784-2LV-c \
+  -o build-manual/run_hls.tcl
+```
+
+These additional commands generate **synthesis inputs**, rather than HDL directly. Execute the generated script with Vitis HLS to synthesize the actor library:
+
+```bash
+cd build-manual
+vitis-run --mode hls --tcl run_hls.tcl
+cd ..
+```
+
+Use the resulting HDL library with its matching protocol description in MDC, then rebuild and validate the accelerator.
+
+## 3. Merge in MDC using CAPH HDL
+
+Import both exported XDF networks and their CAL interfaces into the MDC/Orcc project, preserving the generated `baseline` and `custom` package structure. Select the CAPH actor library and its matching protocol description, then enable network merging in MDC.
+
+Ensure the actor port names, widths, and handshake signals match the selected HDL components. Use the CAPH library adapted to the exported interfaces; changing a library path alone does not reconcile incompatible port names or protocols.
+
+MDC merges the two networks, inserts configuration-dependent switching logic, and generates the coprocessor and platform-integration files. Continue with the Vivado and Linux instructions in the parent example directory.
+
+**The optional HLS implementation requires its own hardware build and numerical validation.** Regenerate the accelerator, bitstream, and matching software configuration. Compare Roberts and Sobel outputs against their reference data, including the first execution after loading the FPGA and repeated configuration switching.
+
+## Interface and test configuration
+
+The source regions declare the size input first (`i6`) and the pixel input second (`i8`). The supplied merged snapshot likewise uses `in0` for size and `in1` for pixels. 
+
+After building the generated Linux utilities, run:
+
+```bash
+./linux/userspace/mdc_test --describe
+```
+
+Use the exact mode names and port mappings from that build, and associate each input file with the correct semantic input. Consult the generated `linux/TESTING.md` for test options and file formats.

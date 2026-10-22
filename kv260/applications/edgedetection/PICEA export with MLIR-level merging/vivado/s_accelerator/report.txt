@@ -1,0 +1,18 @@
+###########################################################################
+# Multi-Dataflow Composer report ##########################################
+###########################################################################
+
+# input networks composition
+ - network top number of actors: 25
+ --> input networks total number of actors: 25
+
+# multi-dataflow network composition: 00_top0
+ - number of merged networks: 0,1
+ - number of actors: 25
+ -- original actors: 19 (76.0%)*
+ -- sbox actors: 6 (24.0%)*
+ -- shared actors 6 (24.0%)**
+ * with respect to the multi-dataflow network number of actors
+** with respect to the input networks total number of actors
+
+###########################################################################

@@ -1,9 +1,0 @@
-package custom;
-
-actor Sbox2x1int16 (int SIZE=16)
-  int(size=SIZE) in1,
-  int(size=SIZE) in2
-  ==>
-  int(size=SIZE) out1
-:
-end

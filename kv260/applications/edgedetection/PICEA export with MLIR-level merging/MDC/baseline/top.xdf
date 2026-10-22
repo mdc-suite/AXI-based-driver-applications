@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?><XDF name="roberts,Sobel">
+  <Port kind="Input" name="in0">
+    <Type name="int">
+      <Entry kind="Expr" name="size">
+        <Expr kind="Literal" literal-kind="Integer" value="6"/>
+      </Entry>
+    </Type>
+  </Port>
+  <Port kind="Input" name="in1">
+    <Type name="int">
+      <Entry kind="Expr" name="size">
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+      </Entry>
+    </Type>
+  </Port>
+  <Port kind="Output" name="out0">
+    <Type name="int">
+      <Entry kind="Expr" name="size">
+        <Expr kind="Literal" literal-kind="Integer" value="8"/>
+      </Entry>
+    </Type>
+  </Port>
+  <Instance id="line_buffer_0">
+    <Class name="custom.line_buffer"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_1">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_2">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="roberts_x_3">
+    <Class name="custom.roberts_x"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="roberts_y_4">
+    <Class name="custom.roberts_y"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="abs_sum_5">
+    <Class name="custom.abs_sum"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="thr_6">
+    <Class name="custom.thr"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="remove_2x2_7">
+    <Class name="custom.remove_2x2"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="line_buffer_8">
+    <Class name="custom.line_buffer"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="line_buffer_9">
+    <Class name="custom.line_buffer"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_10">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_11">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_12">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_13">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_14">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="delay_15">
+    <Class name="custom.delay"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sobel_x_16">
+    <Class name="custom.sobel_x"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sobel_y_17">
+    <Class name="custom.sobel_y"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="remove_3x3_18">
+    <Class name="custom.remove_3x3"/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_0">
+    <Class name="custom.Sbox1x2int6"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="6"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_1">
+    <Class name="custom.Sbox1x2int8"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_2">
+    <Class name="custom.Sbox1x2int8"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_3">
+    <Class name="custom.Sbox2x1int8"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="8"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_4">
+    <Class name="custom.Sbox2x1int14"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="14"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Instance id="sbox_5">
+    <Class name="custom.Sbox2x1int14"/>
+    <Parameter name="SIZE">
+      <Expr kind="Literal" literal-kind="Integer" value="14"/>
+    </Parameter>
+    <Attribute kind="String" name="baseline.roberts" value="{0=false}"/>
+    <Attribute kind="String" name="baseline.Sobel" value="{0=true}"/>
+    <Attribute kind="String" name="sbox" value=""/>
+    <Attribute kind="Flag" name="count"/>
+  </Instance>
+  <Connection dst="line_buffer_0" dst-port="arg0" src="sbox_0" src-port="out1"/>
+  <Connection dst="line_buffer_0" dst-port="arg1" src="sbox_0" src-port="out1"/>
+  <Connection dst="line_buffer_0" dst-port="arg2" src="sbox_1" src-port="out1"/>
+  <Connection dst="delay_1" dst-port="arg0" src="line_buffer_0" src-port="arg3"/>
+  <Connection dst="delay_2" dst-port="arg0" src="sbox_1" src-port="out1"/>
+  <Connection dst="roberts_x_3" dst-port="arg0" src="delay_1" src-port="arg1"/>
+  <Connection dst="roberts_x_3" dst-port="arg1" src="line_buffer_0" src-port="arg3"/>
+  <Connection dst="roberts_x_3" dst-port="arg2" src="delay_2" src-port="arg1"/>
+  <Connection dst="roberts_x_3" dst-port="arg3" src="sbox_1" src-port="out1"/>
+  <Connection dst="roberts_y_4" dst-port="arg0" src="delay_1" src-port="arg1"/>
+  <Connection dst="roberts_y_4" dst-port="arg1" src="line_buffer_0" src-port="arg3"/>
+  <Connection dst="roberts_y_4" dst-port="arg2" src="delay_2" src-port="arg1"/>
+  <Connection dst="roberts_y_4" dst-port="arg3" src="sbox_1" src-port="out1"/>
+  <Connection dst="abs_sum_5" dst-port="arg0" src="sbox_4" src-port="out1"/>
+  <Connection dst="abs_sum_5" dst-port="arg1" src="sbox_5" src-port="out1"/>
+  <Connection dst="thr_6" dst-port="arg0" src="abs_sum_5" src-port="arg2"/>
+  <Connection dst="remove_2x2_7" dst-port="arg0" src="sbox_0" src-port="out1"/>
+  <Connection dst="remove_2x2_7" dst-port="arg1" src="sbox_2" src-port="out1"/>
+  <Connection dst="line_buffer_8" dst-port="arg0" src="sbox_0" src-port="out2"/>
+  <Connection dst="line_buffer_8" dst-port="arg1" src="sbox_0" src-port="out2"/>
+  <Connection dst="line_buffer_8" dst-port="arg2" src="sbox_1" src-port="out2"/>
+  <Connection dst="line_buffer_9" dst-port="arg0" src="sbox_0" src-port="out2"/>
+  <Connection dst="line_buffer_9" dst-port="arg1" src="sbox_0" src-port="out2"/>
+  <Connection dst="line_buffer_9" dst-port="arg2" src="line_buffer_8" src-port="arg3"/>
+  <Connection dst="delay_10" dst-port="arg0" src="line_buffer_9" src-port="arg3"/>
+  <Connection dst="delay_11" dst-port="arg0" src="delay_10" src-port="arg1"/>
+  <Connection dst="delay_12" dst-port="arg0" src="line_buffer_8" src-port="arg3"/>
+  <Connection dst="delay_13" dst-port="arg0" src="delay_12" src-port="arg1"/>
+  <Connection dst="delay_14" dst-port="arg0" src="sbox_1" src-port="out2"/>
+  <Connection dst="delay_15" dst-port="arg0" src="delay_14" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg0" src="delay_11" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg1" src="delay_10" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg2" src="line_buffer_9" src-port="arg3"/>
+  <Connection dst="sobel_x_16" dst-port="arg3" src="delay_13" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg4" src="delay_12" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg5" src="line_buffer_8" src-port="arg3"/>
+  <Connection dst="sobel_x_16" dst-port="arg6" src="delay_15" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg7" src="delay_14" src-port="arg1"/>
+  <Connection dst="sobel_x_16" dst-port="arg8" src="sbox_1" src-port="out2"/>
+  <Connection dst="sobel_y_17" dst-port="arg0" src="delay_11" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg1" src="delay_10" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg2" src="line_buffer_9" src-port="arg3"/>
+  <Connection dst="sobel_y_17" dst-port="arg3" src="delay_13" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg4" src="delay_12" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg5" src="line_buffer_8" src-port="arg3"/>
+  <Connection dst="sobel_y_17" dst-port="arg6" src="delay_15" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg7" src="delay_14" src-port="arg1"/>
+  <Connection dst="sobel_y_17" dst-port="arg8" src="sbox_1" src-port="out2"/>
+  <Connection dst="remove_3x3_18" dst-port="arg0" src="sbox_0" src-port="out2"/>
+  <Connection dst="remove_3x3_18" dst-port="arg1" src="sbox_2" src-port="out2"/>
+  <Connection dst="sbox_0" dst-port="in1" src="" src-port="in0"/>
+  <Connection dst="sbox_1" dst-port="in1" src="" src-port="in1"/>
+  <Connection dst="sbox_2" dst-port="in1" src="thr_6" src-port="arg1"/>
+  <Connection dst="sbox_3" dst-port="in1" src="remove_2x2_7" src-port="arg2"/>
+  <Connection dst="sbox_3" dst-port="in2" src="remove_3x3_18" src-port="arg2"/>
+  <Connection dst="sbox_4" dst-port="in1" src="roberts_x_3" src-port="arg4"/>
+  <Connection dst="sbox_4" dst-port="in2" src="sobel_x_16" src-port="arg9"/>
+  <Connection dst="sbox_5" dst-port="in1" src="roberts_y_4" src-port="arg4"/>
+  <Connection dst="sbox_5" dst-port="in2" src="sobel_y_17" src-port="arg9"/>
+  <Connection dst="" dst-port="out0" src="sbox_3" src-port="out1"/>
+</XDF>
