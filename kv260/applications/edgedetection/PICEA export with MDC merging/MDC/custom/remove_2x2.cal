@@ -1,0 +1,9 @@
+package custom;
+
+actor remove_2x2()
+  int(size=6) arg0,
+  int(size=8) arg1
+  ==>
+  int(size=8) arg2
+:
+end

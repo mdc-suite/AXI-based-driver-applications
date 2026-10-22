@@ -1,0 +1,16 @@
+package custom;
+
+actor sobel_x()
+  int(size=8) arg0,
+  int(size=8) arg1,
+  int(size=8) arg2,
+  int(size=8) arg3,
+  int(size=8) arg4,
+  int(size=8) arg5,
+  int(size=8) arg6,
+  int(size=8) arg7,
+  int(size=8) arg8
+  ==>
+  int(size=14) arg9
+:
+end

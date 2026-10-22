@@ -1,0 +1,170 @@
+{
+  "schema_version": 2,
+  "generation_stage": "tcl_scripts_emitted",
+  "deployment_ready": false,
+  "network": "multi_dataflow",
+  "target": {
+    "profile": "kv260-linux-stream32-v2",
+    "part": "xck26-sfvc784-2LV-c",
+    "board_part": "xilinx.com:kv260_som:part0:1.4",
+    "processor": "ARM",
+    "coupling": "STREAM",
+    "intended_runtime": "linux-uniss-dma"
+  },
+  "ports": [
+    {
+      "id": "input:0",
+      "name": "in_pel",
+      "direction": "input",
+      "index": 0,
+      "token_bits": 8,
+      "token_signed": false,
+      "wrapper_data_bits": 8,
+      "axis_interface": "s00_axis",
+      "transport_bits": 32,
+      "bytes_per_token": 4,
+      "packing": "one_token_per_word_low_bits",
+      "semantic_role": null
+    },
+    {
+      "id": "input:1",
+      "name": "in_size",
+      "direction": "input",
+      "index": 1,
+      "token_bits": 6,
+      "token_signed": false,
+      "wrapper_data_bits": 6,
+      "axis_interface": "s01_axis",
+      "transport_bits": 32,
+      "bytes_per_token": 4,
+      "packing": "one_token_per_word_low_bits",
+      "semantic_role": null
+    },
+    {
+      "id": "output:0",
+      "name": "out_pel",
+      "direction": "output",
+      "index": 0,
+      "token_bits": 8,
+      "token_signed": false,
+      "wrapper_data_bits": 8,
+      "axis_interface": "m00_axis",
+      "transport_bits": 32,
+      "bytes_per_token": 4,
+      "packing": "one_token_per_word_low_bits",
+      "semantic_role": null
+    }
+  ],
+  "modes": [
+    {
+      "id": 1,
+      "name": "Roberts",
+      "selector_used": true,
+      "active_port_ids": [
+        "input:0",
+        "input:1",
+        "output:0"
+      ],
+      "membership_source": "original_network_ports_and_vertex_map"
+    },
+    {
+      "id": 2,
+      "name": "Sobel",
+      "selector_used": true,
+      "active_port_ids": [
+        "input:0",
+        "input:1",
+        "output:0"
+      ],
+      "membership_source": "original_network_ports_and_vertex_map"
+    }
+  ],
+  "metadata_status": {
+    "mode_ids_available": true,
+    "mode_port_membership_complete": true,
+    "application_roles_complete": false
+  },
+  "wrapper_registers": [
+    {
+      "name": "control",
+      "offset_bytes": 0,
+      "width_bits": 32,
+      "mode_id_lsb": 24,
+      "mode_id_width": 8,
+      "counter_clear_bit": 2,
+      "start_bit": 0
+    },
+    {
+      "name": "output_count_0",
+      "port_id": "output:0",
+      "offset_bytes": 4,
+      "width_bits": 32,
+      "units": "accepted_axis_beats",
+      "counter_bits": 32,
+      "max_packet_beats": 4294967294,
+      "tlast_disabled_value": 4294967295
+    }
+  ],
+  "hardware_plan": {
+    "status": "scripts_emitted_not_built",
+    "dma_topology": "one_controller_per_port",
+    "control_base_address": "0xA0010000",
+    "control_range_bytes": 65536,
+    "memory_ps_interface": "S_AXI_HPC0_FPD",
+    "dma_controllers": [
+      {
+        "controller": "axi_dma_0",
+        "channel_id": 0,
+        "port_id": "input:0",
+        "direction": "MM2S",
+        "base_address": "0xA0000000",
+        "range_bytes": 65536,
+        "scatter_gather": false
+      },
+      {
+        "controller": "axi_dma_1",
+        "channel_id": 1,
+        "port_id": "input:1",
+        "direction": "MM2S",
+        "base_address": "0xA0100000",
+        "range_bytes": 65536,
+        "scatter_gather": false
+      },
+      {
+        "controller": "axi_dma_2",
+        "channel_id": 2,
+        "port_id": "output:0",
+        "direction": "S2MM",
+        "base_address": "0xA0300000",
+        "range_bytes": 65536,
+        "scatter_gather": false
+      }
+    ],
+    "vivado_version": "2024.2",
+    "dma_address_bits": 32,
+    "dma_length_bits": 23,
+    "control_address_bits": 16,
+    "clock_mhz": 100,
+    "ddr_low_base": "0x00000000",
+    "ddr_low_range": "0x80000000"
+  },
+  "linux_driver": {
+    "abi_version": 1,
+    "device": "/dev/mdc_accel0",
+    "buffer_bytes_per_channel": 65536,
+    "dma_mask_bits": 32,
+    "completion": "polling",
+    "legacy_uniss_abi_compatible": false,
+    "deployment_verified": false
+  },
+  "integration": {
+    "kv260_tcl_consumes_shared_spec": true,
+    "legacy_driver_consumes_manifest": false,
+    "kernel_uapi_version": 1,
+    "linux_driver_consumes_shared_spec": true,
+    "linux_generation_stage": "sources_emitted"
+  },
+  "warnings": [
+    "Output counter is 32 bits; DMA buffer capacity and configured DMA length width impose separate, smaller limits."
+  ]
+}

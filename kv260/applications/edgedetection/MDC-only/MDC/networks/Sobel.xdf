@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><XDF name="Sobel">
+    <Port kind="Input" name="in_pel">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="in_size">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="out_pel">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Instance id="sobel_x_0">
+        <Class name="actors.sobel_x"/>
+    </Instance>
+    <Instance id="sobel_y_0">
+        <Class name="actors.sobel_y"/>
+    </Instance>
+    <Instance id="delay_pel21">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="line_buffer_pel12">
+        <Class name="actors.line_buffer"/>
+    </Instance>
+    <Instance id="delay_pel11">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="abs_sum_0">
+        <Class name="actors.abs_sum"/>
+    </Instance>
+    <Instance id="thr_0">
+        <Class name="actors.thr"/>
+    </Instance>
+    <Instance id="remove_3x3_0">
+        <Class name="actors.remove_3x3"/>
+    </Instance>
+    <Instance id="line_buffer_pel02">
+        <Class name="actors.line_buffer"/>
+    </Instance>
+    <Instance id="delay_pel20">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="delay_pel10">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="delay_pel01">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="delay_pel00">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Connection dst="line_buffer_pel12" dst-port="ext_size" src="" src-port="in_size"/>
+    <Connection dst="sobel_x_0" dst-port="pel22" src="" src-port="in_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel21" src="delay_pel21" src-port="out_pel"/>
+    <Connection dst="delay_pel21" dst-port="in_pel" src="" src-port="in_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel12" src="line_buffer_pel12" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel11" src="delay_pel11" src-port="out_pel"/>
+    <Connection dst="delay_pel11" dst-port="in_pel" src="line_buffer_pel12" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel12" dst-port="in_pel" src="" src-port="in_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel12" src="line_buffer_pel12" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel11" src="delay_pel11" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel21" src="delay_pel21" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel22" src="" src-port="in_pel"/>
+    <Connection dst="abs_sum_0" dst-port="in_gx" src="sobel_x_0" src-port="out_pel"/>
+    <Connection dst="abs_sum_0" dst-port="in_gy" src="sobel_y_0" src-port="out_pel"/>
+    <Connection dst="thr_0" dst-port="in_g" src="abs_sum_0" src-port="out_g"/>
+    <Connection dst="remove_3x3_0" dst-port="in_pel" src="thr_0" src-port="out_pel"/>
+    <Connection dst="" dst-port="out_pel" src="remove_3x3_0" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel12" dst-port="real_size" src="" src-port="in_size"/>
+    <Connection dst="remove_3x3_0" dst-port="in_size" src="" src-port="in_size"/>
+    <Connection dst="delay_pel20" dst-port="in_pel" src="delay_pel21" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel20" src="delay_pel20" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel20" src="delay_pel20" src-port="out_pel"/>
+    <Connection dst="delay_pel10" dst-port="in_pel" src="delay_pel11" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel10" src="delay_pel10" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel10" src="delay_pel10" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel02" dst-port="in_pel" src="line_buffer_pel12" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel02" dst-port="real_size" src="" src-port="in_size"/>
+    <Connection dst="line_buffer_pel02" dst-port="ext_size" src="" src-port="in_size"/>
+    <Connection dst="delay_pel01" dst-port="in_pel" src="line_buffer_pel02" src-port="out_pel"/>
+    <Connection dst="delay_pel00" dst-port="in_pel" src="delay_pel01" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel00" src="delay_pel00" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel00" src="delay_pel00" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel01" src="delay_pel01" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel01" src="delay_pel01" src-port="out_pel"/>
+    <Connection dst="sobel_x_0" dst-port="pel02" src="line_buffer_pel02" src-port="out_pel"/>
+    <Connection dst="sobel_y_0" dst-port="pel02" src="line_buffer_pel02" src-port="out_pel"/>
+</XDF>

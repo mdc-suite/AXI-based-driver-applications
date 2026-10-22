@@ -1,0 +1,8 @@
+package custom;
+
+actor delay()
+  int(size=8) arg0
+  ==>
+  int(size=8) arg1
+:
+end

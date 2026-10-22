@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="Roberts">
+    <Port kind="Input" name="in_pel">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Input" name="in_size">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="6"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Port kind="Output" name="out_pel">
+        <Type name="uint">
+            <Entry kind="Expr" name="size">
+                <Expr kind="Literal" literal-kind="Integer" value="8"/>
+            </Entry>
+        </Type>
+    </Port>
+    <Instance id="roberts_x_0">
+        <Class name="actors.roberts_x"/>
+    </Instance>
+    <Instance id="roberts_y_0">
+        <Class name="actors.roberts_y"/>
+    </Instance>
+    <Instance id="delay_pel10">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="line_buffer_pel01">
+        <Class name="actors.line_buffer"/>
+    </Instance>
+    <Instance id="delay_pel00">
+        <Class name="actors.delay"/>
+    </Instance>
+    <Instance id="abs_sum_0">
+        <Class name="actors.abs_sum"/>
+    </Instance>
+    <Instance id="thr_0">
+        <Class name="actors.thr"/>
+    </Instance>
+    <Instance id="remove_2x2_0">
+        <Class name="actors.remove_2x2"/>
+    </Instance>
+    <Connection dst="line_buffer_pel01" dst-port="ext_size" src="" src-port="in_size"/>
+    <Connection dst="roberts_x_0" dst-port="pel11" src="" src-port="in_pel"/>
+    <Connection dst="roberts_x_0" dst-port="pel10" src="delay_pel10" src-port="out_pel"/>
+    <Connection dst="delay_pel10" dst-port="in_pel" src="" src-port="in_pel"/>
+    <Connection dst="roberts_x_0" dst-port="pel01"
+        src="line_buffer_pel01" src-port="out_pel"/>
+    <Connection dst="roberts_x_0" dst-port="pel00" src="delay_pel00" src-port="out_pel"/>
+    <Connection dst="delay_pel00" dst-port="in_pel"
+        src="line_buffer_pel01" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel01" dst-port="in_pel" src="" src-port="in_pel"/>
+    <Connection dst="roberts_y_0" dst-port="pel01"
+        src="line_buffer_pel01" src-port="out_pel"/>
+    <Connection dst="roberts_y_0" dst-port="pel00" src="delay_pel00" src-port="out_pel"/>
+    <Connection dst="roberts_y_0" dst-port="pel10" src="delay_pel10" src-port="out_pel"/>
+    <Connection dst="roberts_y_0" dst-port="pel11" src="" src-port="in_pel"/>
+    <Connection dst="abs_sum_0" dst-port="in_gx" src="roberts_x_0" src-port="out_pel"/>
+    <Connection dst="abs_sum_0" dst-port="in_gy" src="roberts_y_0" src-port="out_pel"/>
+    <Connection dst="thr_0" dst-port="in_g" src="abs_sum_0" src-port="out_g"/>
+    <Connection dst="remove_2x2_0" dst-port="in_pel" src="thr_0" src-port="out_pel"/>
+    <Connection dst="" dst-port="out_pel" src="remove_2x2_0" src-port="out_pel"/>
+    <Connection dst="line_buffer_pel01" dst-port="real_size" src="" src-port="in_size"/>
+    <Connection dst="remove_2x2_0" dst-port="in_size" src="" src-port="in_size"/>
+</XDF>

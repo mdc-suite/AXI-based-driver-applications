@@ -5,6 +5,7 @@ Each subfolder represents a specific use case and contains both the hardware log
 ## Folder contents
 * **`aes/`**: Example application for data encryption/decryption using an AES accelerator.
 * **`vpa/`**: Example accelerator for image processing.
+* **`edgedetection/`**: Example accelerator for image processing with Roberts/Sobel.
 
 ---
 For specific instructions on how to compile and run individual tests, refer to the README files in each subfolder.

@@ -1,0 +1,10 @@
+package custom;
+
+actor line_buffer()
+  int(size=6) arg0,
+  int(size=6) arg1,
+  int(size=8) arg2
+  ==>
+  int(size=8) arg3
+:
+end

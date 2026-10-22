@@ -25,3 +25,18 @@ Inside each board's directory (`kv260/` and `zedboard/`), the content is structu
 * **`ubuntu-driver/`** *(Available for kv260)*: Contains the specific instructions and source code to compile and install the driver on Ubuntu.
 * **`yocto-driver/`**: Contains the specific instructions and source code to compile and install the driver using the Yocto Project build system.
 * **`applications/`**: Contains examples of hardware accelerators that implement the AXI4-Stream interface described above, including their test applications to verify correct operation.
+
+## Recent Updates
+
+- Extended the Kria KV260 Roberts–Sobel edge-detection example to demonstrate three design flows:
+  1. **MDC-only:** CAPH-derived networks and actor HDL, with network merging in MDC.
+  2. **PICEA export with MDC merging:** MLIR-to-XDF/CAL export through PICEA, followed by merging in MDC.
+  3. **PICEA region merging:** Merging within MLIR, followed by export of the premerged network to MDC for hardware composition and platform integration.
+- Added **EmitHLS and Vitis HLS actor-generation support**, alongside the existing CAPH HDL library. RESIN provides the PICEA compiler entry point for preparation, optional region merging, and export.
+- Added generated **Vivado scripts** for accelerator IP packaging, Kria system integration, and bitstream generation.
+- Added a generated **Linux deployment package** containing the device-tree overlay source, `mdc_dma` driver, configuration headers, and userspace utilities. These examples use **`/dev/mdc_accel0`**, with a separate interface from the existing `/dev/uniss_dma` driver.
+- Added **`mdc_probe`, `mdc_run`, and `mdc_test`** for device inspection, binary-stream execution, and named-port testing with reference-output comparison.
+- Added bitstreams, input datasets, and reference outputs for Roberts and Sobel, with deployment instructions using `.bit` files directly through `fpgautil`.
+- Updated the tutorials and application READMEs with compilation, synthesis, deployment, configuration selection, and numerical-validation instructions.
+
+See the README files in the corresponding board and application directories for flow-specific requirements and commands.

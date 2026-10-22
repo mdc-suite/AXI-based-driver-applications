@@ -1,0 +1,9 @@
+package custom;
+
+actor Sbox1x2int6 (int SIZE=6)
+  int(size=SIZE) in1
+  ==>
+  int(size=SIZE) out1,
+  int(size=SIZE) out2
+:
+end

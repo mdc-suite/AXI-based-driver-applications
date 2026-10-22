@@ -1,0 +1,8 @@
+package custom;
+
+actor thr()
+  int(size=14) arg0
+  ==>
+  int(size=8) arg1
+:
+end

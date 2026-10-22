@@ -1,0 +1,11 @@
+package custom;
+
+actor roberts_x()
+  int(size=8) arg0,
+  int(size=8) arg1,
+  int(size=8) arg2,
+  int(size=8) arg3
+  ==>
+  int(size=14) arg4
+:
+end

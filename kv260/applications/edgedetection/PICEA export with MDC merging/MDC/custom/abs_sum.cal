@@ -1,0 +1,9 @@
+package custom;
+
+actor abs_sum()
+  int(size=14) arg0,
+  int(size=14) arg1
+  ==>
+  int(size=14) arg2
+:
+end
