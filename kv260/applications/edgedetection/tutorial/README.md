@@ -953,6 +953,18 @@ The commands below reproduce the previously validated $16 \times 16$
 edge-detection test. They are executed from the deployment directory
 containing the `linux` folder and the input and reference files.
 
+Inspect the generated configuration before testing:
+
+    ./linux/userspace/mdc_test --describe
+
+The supplied merged MLIR declares in0 as the 6-bit size input, in1 as
+the 8-bit pixel input, and out0 as the 8-bit result. Its configuration
+metadata names the networks `Roberts` and `Sobel`.
+
+Obtain numeric mode IDs, channel indices, buffer capacity, and active
+ports from `--describe` and linux/include/mdc_test_config.h; these
+values depend on the generated build.
+
 ## Preparing Input Data and Reference Outputs {#sec:validation-data}
 
 Prepare the input image, the image-size parameter, and the reference
